@@ -1,0 +1,4 @@
+[submodule "1800CLOUD/Baseline"]
+	path = 1800CLOUD/Baseline
+	url = git@github.com:1800CLOUD/Baseline.git
+	branch = 15.0
