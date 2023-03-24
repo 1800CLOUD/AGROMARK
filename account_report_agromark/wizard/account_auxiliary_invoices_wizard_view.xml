@@ -1,0 +1,13 @@
+<odoo>
+    <record id="account_auxiliary_invoices_wizard_view_agromark_inherit" model="ir.ui.view">
+        <field name="name">account.auxiliary.invoices.wizard.view.agromark.inherit</field>
+        <field name="model">account.auxiliary.invoices.wizard</field>
+        <field name="inherit_id" ref="account_report.account_auxiliary_invoices_wizard_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer/button[1]" position="before">
+                <button string="View" class="btn-primary" name="preview_html" type="object"/>
+                    or
+            </xpath>
+        </field>
+    </record>
+</odoo>

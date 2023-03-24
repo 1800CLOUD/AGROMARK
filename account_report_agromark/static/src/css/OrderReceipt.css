@@ -1,0 +1,13 @@
+.orderlines {
+    font-size: 90%;
+}
+.pos-receipt-order {
+    text-align: center;
+    font-size: 100% !important;
+}
+.pos-receipt-left-padding {
+    font-size: 85%;
+}
+.price_display {
+    font-size: 14px;
+}
