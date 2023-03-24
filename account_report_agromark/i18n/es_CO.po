@@ -1,0 +1,261 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* account_report_agromark
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-16 17:08+0000\n"
+"PO-Revision-Date: 2023-03-16 17:08+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: account_report_agromark
+#. openerp-web
+#: code:addons/account_report_agromark/static/src/xml/OrderReceipt.xml:0
+#, python-format
+msgid "'[' + line.product_default_code + '] ' + line.product_name_wrapped[0]"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Account Analytic"
+msgstr "Cuenta Analítica"
+
+#. module: account_report_agromark
+#: model:ir.actions.report,name:account_report_agromark.action_report_account_auxiliary_invoices_html
+msgid "Account Auxiliary Invoices HTML"
+msgstr ""
+
+#. module: account_report_agromark
+#: model:ir.actions.report,name:account_report_agromark.action_report_account_auxiliary_invoices_qweb
+msgid "Account Auxiliary Invoices PDF"
+msgstr ""
+
+#. module: account_report_agromark
+#: model:ir.model.fields,field_description:account_report_agromark.field_account_auxiliary_wizard__account_analityc_ids
+#: model:ir.model.fields,field_description:account_report_agromark.field_account_balance_wizard__account_analityc_ids
+msgid "Accounts"
+msgstr "Cuentas Analíticas"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Amount"
+msgstr "Monto"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Analytic Account Name"
+msgstr "Cuenta Analítica"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "Auxiliar de Impuestos"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "Auxiliar de Impuestos NIIF"
+msgstr ""
+
+#. module: account_report_agromark
+#: model:ir.model,name:account_report_agromark.model_account_auxiliary_invoices_wizard
+msgid "Auxiliary Report Invoices Wizard"
+msgstr "Reporte Auxiliar de Impuestos Wizard"
+
+#. module: account_report_agromark
+#: model:ir.model,name:account_report_agromark.model_account_auxiliary_wizard
+msgid "Auxiliary Report Wizard"
+msgstr "Asistente Reporte Auxiliar"
+
+#. module: account_report_agromark
+#: model:ir.model,name:account_report_agromark.model_account_balance_wizard
+msgid "Balance Report Wizard"
+msgstr "Asistente Reporte Balance"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Balance amount"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#, python-format
+msgid "Balance de Pruebas"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#, python-format
+msgid "Balance de Pruebas NIIF"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Code"
+msgstr "Código"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "Company"
+msgstr "Compañía"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Credit"
+msgstr "Crédito"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Date"
+msgstr "Fecha"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Debit"
+msgstr "Débito"
+
+#. module: account_report_agromark
+#. openerp-web
+#: code:addons/account_report_agromark/static/src/xml/OrderReceipt.xml:0
+#, python-format
+msgid "Factura POS"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Final"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "From"
+msgstr "Desde"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Initial"
+msgstr "Inicial"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Journal"
+msgstr "Diario"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Line"
+msgstr "Línea"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#, python-format
+msgid "Move"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "NIT"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Name"
+msgstr "Nombre"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid ""
+"Not found report ID: "
+"account_report_agromark.account_auxiliary_invoices_template"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_auxiliary_wizard.py:0
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Partner"
+msgstr "Cliente"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "Report"
+msgstr ""
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/wizard/account_balance_wizard.py:0
+#, python-format
+msgid "Residual amount (balance)"
+msgstr "Balance"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "To"
+msgstr "Hasta"
+
+#. module: account_report_agromark
+#: code:addons/account_report_agromark/report/account_balance.py:0
+#: code:addons/account_report_agromark/wizard/account_auxiliary_invoices_wizard.py:0
+#, python-format
+msgid "Type"
+msgstr "Tipo"
+
+#. module: account_report_agromark
+#: model_terms:ir.ui.view,arch_db:account_report_agromark.account_auxiliary_invoices_wizard_view_agromark_inherit
+msgid "View"
+msgstr ""
+
+#. module: account_report_agromark
+#. openerp-web
+#: code:addons/account_report_agromark/static/src/xml/OrderReceipt.xml:0
+#: code:addons/account_report_agromark/static/src/xml/OrderReceipt.xml:0
+#, python-format
+msgid "display: none"
+msgstr ""
+
+#. module: account_report_agromark
+#: model_terms:ir.ui.view,arch_db:account_report_agromark.account_auxiliary_invoices_wizard_view_agromark_inherit
+msgid "or"
+msgstr "o"

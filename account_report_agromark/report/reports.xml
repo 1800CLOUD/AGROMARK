@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="action_report_account_auxiliary_invoices_qweb" model="ir.actions.report">
+        <field name="name">Account Auxiliary Invoices PDF</field>
+        <field name="model">account.auxiliary.invoices.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">account_report_agromark.account_auxiliary_invoices_template</field>
+        <field name="report_file">account_report_agromark.account_auxiliary_invoices_template</field>
+        <field name="paperformat_id" ref="account_report.report_qweb_paperformat" />
+    </record>
+    <record id="action_report_account_auxiliary_invoices_html" model="ir.actions.report">
+        <field name="name">Account Auxiliary Invoices HTML</field>
+        <field name="model">account.auxiliary.invoices.wizard</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">account_report_agromark.account_auxiliary_invoices_template</field>
+        <field name="report_file">account_report_agromark.account_auxiliary_invoices_template</field>
+    </record>
+
+</odoo>
