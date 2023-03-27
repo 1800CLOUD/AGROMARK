@@ -5,7 +5,7 @@
         Inventario Agromark
     ''',
     'description': '''
-        - Base de impuestos sin considerar descuento en compras y facturas proovedor.
+        - Reporte de disponibilidad de inventario
     ''',
     'author': '1-800CLOUD',
     'website': 'http://www.1-800cloud.com',
@@ -14,11 +14,12 @@
     'version': '15.0.0.0.0',
     'depends': [
         'stock',
-        'sale'
+        'sale',
+        'product_brand'
     ],
     'data': [
         # 'security/ir.model.access.csv',
-         'views/stock_quant.xml',
-         'wizard/stock_quantity_history.xml',
+         'reports/stock_report.xml',
+         'views/menuitems.xml',
     ],
 }
