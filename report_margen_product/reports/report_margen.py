@@ -13,6 +13,7 @@ import io
 
 class ReportInvoice(models.TransientModel):
     _name = "report.margen.product"
+    _description = 'Reporte de margen de productos'
     
     name = fields.Char('Nombre', default='Informe de Margen de Producto', readonly=True)
     date_from = fields.Date('Desde', required=True, default=(fields.Datetime.now() - relativedelta(month=1)))

@@ -14,7 +14,9 @@ import io
 
 class ReportInvoice(models.TransientModel):
     _name = "report.invoice"
-    
+    _description = 'Reporte de productos facturados'
+
+
     name = fields.Char('Nombre', default='Informe de Facturados', readonly=True)
     date_from = fields.Date('Desde', required=True, default=(fields.Datetime.now() - relativedelta(month=1)))
     date_to = fields.Date('Hasta', required=True, default=(fields.Datetime.now()).date())

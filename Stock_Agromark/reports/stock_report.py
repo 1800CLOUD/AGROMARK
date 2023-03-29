@@ -192,12 +192,9 @@ class ReportStockQuantLine(models.Model):
     product_id = fields.Many2one('product.product', 'Producto', copy=False, readonly=True, required=True, index=True)
     location_id = fields.Many2one('stock.location', 'Ubicación', copy=False, readonly=True, required=True)
     lot_id = fields.Many2one('stock.production.lot', 'Lote/Serial', copy=False, readonly=True, index=True)
-    quantity = fields.Float('Cantidad Física', copy=False, readonly=True, required=True,
-                            digits=dp.get_precision('Product Unit of Measure'))
-    reserved_quantity = fields.Float('Cantidad Reservada', digits=dp.get_precision('Product Unit of Measure'),
-                                     copy=False, readonly=True, required=True)
-    available_qty = fields.Float('Cantidad Disponible', digits=dp.get_precision('Product Unit of Measure'),
-                                 copy=False, readonly=True, required=True)
+    quantity = fields.Float('Cantidad Física', copy=False, readonly=True, required=True)
+    reserved_quantity = fields.Float('Cantidad Reservada', copy=False, readonly=True, required=True)
+    available_qty = fields.Float('Cantidad Disponible', copy=False, readonly=True, required=True)
     categ_id = fields.Many2one('product.category', 'Categoría Contable', copy=False, readonly=True, index=True)
     product_brand_id = fields.Many2one(comodel_name="product.brand", string="Marca", copy=False, readonly=True, index=True)
     product_uom_id = fields.Many2one('uom.uom', 'Unidad de Medida', readonly=True, copy=False)
