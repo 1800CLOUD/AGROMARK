@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="report_stock_quant_line_search" model="ir.ui.view">
+        <field name="name">report.stock.quant.line.search</field>
+        <field name="model">report.stock.quant.line</field>
+        <field name="arch" type="xml">
+            <search string="Disponibilidad Stock">
+                <field name="product_id"
+                       filter_domain="['|', ('product_id.default_code', 'ilike', self),('product_id', 'ilike', self)]"/>
+                <field name="lot_id"/>
+                <field name="location_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_product_id" string="Producto" context="{'group_by':'product_id'}"/>
+                    <filter name="group_location_id" string="Ubicación" context="{'group_by':'location_id'}"/>
+                    <separator/>
+                    <filter name="group_categ_id" string="Categoría" context="{'group_by':'categ_id'}"/>
+                    <filter name="group_brand_id" string="Marca" context="{'group_by':'product_brand_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="report_stock_quant_form" model="ir.ui.view">
+        <field name="name">report.stock.quant.form</field>
+        <field name="model">report.stock.quant</field>
+        <field name="arch" type="xml">
+            <form string="Informe Disponibilidad">
+                <sheet>
+                    <div class="oe_button_box">                        
+                        <button name="button_bi" type="object" class="oe_stat_button" icon="fa-sort-amount-asc" 
+                                string="Analizar" context="{'pivot': True}"/>
+                        <button name="get_xlsx_report" type="object" class="oe_stat_button" icon="fa-file-excel-o" string="Excel"/>
+                    </div>
+                    <h1>
+                        <strong>Informe Disponibilidad</strong>
+                    </h1>
+                    <group string="Filtros">
+                        <group string="Almacenamiento">
+                            <field name="location_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Productos">
+                            <field name="product_ids" widget="many2many_tags"/>
+                            <field name="categ_ids" widget="many2many_tags"/>
+                            <field name="xls_filename" invisible="1"/>
+                        </group>
+                        <div>
+                            <p attrs="{'invisible': [('xls_file', '=', False)]}" class="oe_inline" name="xls_file">
+                                Download the XLSX details file: <field name="xls_file" readonly="1" filename="xls_filename"/>
+                            </p>
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="report_stock_quant_line_tree" model="ir.ui.view">
+        <field name="name">report.stock.quant.line.tree</field>
+        <field name="model">report.stock.quant.line</field>
+        <field name="arch" type="xml">
+            <tree string="Disponibilidad Stock">
+                <field name="product_id"/>
+                <field name="location_id"/>
+                <field name="lot_id"/>
+                <field name="product_uom_id"/>
+                <field name="quantity"/>
+                <field name="reserved_quantity"/>
+                <field name="available_qty"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="report_stock_quant_line_pivot" model="ir.ui.view">
+        <field name="name">report.stock.quant.line.pivot</field>
+        <field name="model">report.stock.quant.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Disponibilidad Stock">
+                <field name="location_id" type="row"/>
+                <field name="quantity" type="measure"/>
+                <field name="reserved_quantity" type="measure"/>
+                <field name="available_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_report_stock_quant" model="ir.actions.act_window">
+        <field name="name">Disponibilidad Stock</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">report.stock.quant</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <menuitem id="menu_partner_report_stock"
+            name="Informes 1800CLOUD"
+            parent="stock.menu_stock_root"
+            sequence="98"
+        />
+
+        <menuitem id="menu_action_report_stock"
+            name="Disponibilidad de Stock"
+            action="action_report_stock_quant"
+            parent="menu_partner_report_stock"
+            sequence="10"
+        />
+
+    </data>
+</odoo>
