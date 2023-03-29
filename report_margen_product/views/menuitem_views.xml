@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <menuitem id="menu_partner_report_account"
+            name="Informes 1800CLOUD"
+            parent="account_accountant.menu_accounting"
+            sequence="25"
+        />
+
     <menuitem id="menu_report_margen_product"
               name="Margen de productos"
-              parent="Stock_Agromark.menu_partner_report_stock"
+              parent="report_margen_product.menu_partner_report_account"
               action="action_report_margen"
               sequence="15"/>
 
