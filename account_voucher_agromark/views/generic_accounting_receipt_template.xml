@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data noupdate="0">
+        
+        <template id="generic_accounting_receipt_document" inherit_id="account_voucher.generic_accounting_receipt_document">
+            <xpath expr="//div[hasclass('page')]/div[3]/div/div/table/tr/th[3]" position="after">
+                <th>NIT</th>
+            </xpath>
+            <xpath expr="//div[hasclass('page')]/div[3]/div/div/table/t/tr/td[3]" position="after">
+                <td>
+                    <p>
+                        <span t-field="l.partner_id.vat" />
+                    </p>
+                </td>
+            </xpath>
+            <xpath expr="//div[hasclass('page')]/div[3]/div/div/table/tr[2]/td" position="attributes">
+                <attribute name="colspan">4</attribute>
+            </xpath>
+        </template>
+        
+    </data>
+</odoo>
