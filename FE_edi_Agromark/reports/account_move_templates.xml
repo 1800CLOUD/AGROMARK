@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_account_move_einvoicing_document" inherit_id="l10n_co_bloodo.report_account_move_einvoicing_document">
+
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="before">
+            <th width="8%" name="th_taxes" class="text-center"><span>IMPUESTOS</span></th>
+        </xpath>
+        <xpath expr="//table[@name='invoice_line_table']//td[6]" position="before">
+            <td class="text-center">
+                <t t-foreach="line.tax_ids" t-as="t">
+                    <t t-if="t.tax_group_id.name == 'IVA 19%'">
+                        <span t-esc="'{0:,.2f}'.format(t.amount)"/>
+                        %
+                    </t>
+                </t>
+            </td>
+        </xpath>
+
+    </template>
+
+</odoo>
