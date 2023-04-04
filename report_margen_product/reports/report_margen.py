@@ -43,20 +43,22 @@ class ReportInvoice(models.TransientModel):
                             pb.name,
                             SUM(sol.product_uom_qty) qty, 
                             SUM(sol.price_subtotal) price,
-                            svl.unit_cost*(SUM(sol.product_uom_qty)) AS cost,
-                            SUM(sol.price_subtotal) - svl.unit_cost*(SUM(sol.product_uom_qty)),
-                            (SUM(sol.price_subtotal) - svl.unit_cost*SUM(sol.product_uom_qty)) / SUM(sol.price_subtotal),
-                            (SUM(sol.price_subtotal) - svl.unit_cost*SUM(sol.product_uom_qty)) / (svl.unit_cost*(SUM(sol.product_uom_qty)))
+                            SUM(svl.unit_cost*sol.product_uom_qty) AS cost,
+                            SUM(sol.price_subtotal) - SUM(svl.unit_cost*sol.product_uom_qty),
+                            (SUM(sol.price_subtotal) - SUM(svl.unit_cost*sol.product_uom_qty)) / SUM(sol.price_subtotal),
+                            (SUM(sol.price_subtotal) - SUM(svl.unit_cost*sol.product_uom_qty)) / (SUM(svl.unit_cost*sol.product_uom_qty))
 
                         FROM sale_order_line sol
                             INNER JOIN sale_order so ON sol.order_id = so.id 
                             INNER JOIN product_product pp ON sol.product_id = pp.id 
                             INNER JOIN product_template pt ON pt.id = pp.product_tmpl_id
                             INNER JOIN stock_move sm ON sol.id = sm.sale_line_id 
-                            LEFT JOIN stock_valuation_layer svl ON sm.id = svl.stock_move_id
-                            LEFT JOIN product_brand pb ON pb.id = pt.product_brand_id
+                            INNER JOIN stock_valuation_layer svl ON sm.id = svl.stock_move_id
+                            INNER JOIN product_brand pb ON pb.id = pt.product_brand_id
 
                         WHERE
+                            pt.detailed_type = 'product' AND 
+                            sol.product_uom_qty = sol.qty_invoiced AND
                             so.state = 'done' AND
                             so.date_order BETWEEN   '{dt_from}' AND '{dt_to}' {wh}
                         GROUP BY
@@ -88,7 +90,7 @@ class ReportInvoice(models.TransientModel):
         titles_format.set_align("center")
         titles_format.set_bold()
         worksheet.set_column("A:H", 22)
-        worksheet.set_row(0, 25)
+        #worksheet.set_row(0, 25)
         
         col_num = 0
         for title in titles:
@@ -99,8 +101,8 @@ class ReportInvoice(models.TransientModel):
             row = index + 1
             col_num = 0
             for d in data:
-                if isinstance(d, datetime.date):
-                    d = d.strftime("%Y-%m-%d")
+                #if isinstance(d, datetime.date):
+                #    d = d.strftime("%Y-%m-%d")
                 worksheet.write(row, col_num, d)
                 col_num += 1
         
