@@ -40,6 +40,7 @@ class ReportInvoice(models.TransientModel):
         dt_to = str(self.date_to)
         cr.execute(f'''SELECT
                             DISTINCT pt.name, 
+                            pt.default_code,
                             pb.name,
                             SUM(sol.product_uom_qty),
                             SUM(sol.price_subtotal),
@@ -66,6 +67,7 @@ class ReportInvoice(models.TransientModel):
                             {wh}
                         GROUP BY 
                         pt.name,
+                        pt.default_code,
                         pb.name
                         
                       ''')
@@ -77,6 +79,7 @@ class ReportInvoice(models.TransientModel):
         output = io.BytesIO()
         titles = [
                 'Producto', 
+                'Referencia Interna',
                 'Marca',
                 'Cantidad',
                 'Ingreso', 
@@ -92,7 +95,7 @@ class ReportInvoice(models.TransientModel):
         titles_format = workbook.add_format()
         titles_format.set_align("center")
         titles_format.set_bold()
-        worksheet.set_column("A:H", 22)
+        worksheet.set_column("A:I", 22)
         worksheet.set_row(0, 25)
         
         col_num = 0

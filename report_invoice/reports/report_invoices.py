@@ -18,8 +18,8 @@ class ReportInvoice(models.TransientModel):
 
 
     name = fields.Char('Nombre', default='Informe de Facturados', readonly=True)
-    date_from = fields.Date('Desde', required=True, default=(fields.Datetime.now() - relativedelta(month=1)))
-    date_to = fields.Date('Hasta', required=True, default=(fields.Datetime.now()).date())
+    date_from = fields.Datetime('Desde', required=True, default=(fields.Datetime.now() - relativedelta(month=1)))
+    date_to = fields.Datetime('Hasta', required=True, default=(fields.Datetime.now()))
     partner_ids = fields.Many2many('res.partner', string='Clientes') 
     xls_file = fields.Binary(string="XLS file")
     xls_filename = fields.Char()
@@ -55,6 +55,7 @@ class ReportInvoice(models.TransientModel):
                             so.date_order, 
                             so.name, 
                             aa.name,
+                            pt.default_code,
                             pt.name,
                             pc.name,
                             pb.name,
@@ -95,6 +96,7 @@ class ReportInvoice(models.TransientModel):
                         GROUP BY
                         so.name,
                         pc.name,
+                        pt.default_code,
                         pt.name,
                         so.date_order,
                         aa.name,
@@ -121,7 +123,8 @@ class ReportInvoice(models.TransientModel):
                 'Fecha', 
                 'Orden de venta', 
                 'Cuenta', 
-                'Producto', 
+                'Referencia Interna',
+                'Producto',
                 'Categoria',
                 'Marca',
                 'Unidad de medida', 
@@ -141,7 +144,7 @@ class ReportInvoice(models.TransientModel):
         titles_format = workbook.add_format()
         titles_format.set_align("center")
         titles_format.set_bold()
-        worksheet.set_column("A:O", 22)
+        worksheet.set_column("A:P", 22)
         worksheet.set_row(0, 25)
         
         col_num = 0
