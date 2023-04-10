@@ -5,6 +5,8 @@ from odoo import api, fields, models, _
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
+    order_sale_id = fields.Many2one('sale.order', 'Orden de Venta', related='sale_line_ids.order_id', readonly=True, store=True, copy=False)
+
     def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, 
                                       product=None, partner=None, taxes=None, move_type=None):
         res = super(AccountMoveLine, self)._get_price_total_and_subtotal(price_unit=None, quantity=None, 

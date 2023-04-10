@@ -84,7 +84,12 @@ class AccountauxiliaryWizard(models.Model):
             '' as initial,
             coalesce(aml.{debit}, 0) as debit,
             coalesce(aml.{credit}, 0) as credit,
-            '' as final
+            '' as final,
+            CASE 
+                WHEN am.state = 'draft' THEN 'Borrador'
+                WHEN am.state = 'posted' THEN 'Publicado'
+                WHEN am.state = 'cancel' THEN 'Cancelado'
+            ELSE 'N/A' END
         from account_move_line aml
         inner join account_account aa on aa.id = aml.account_id
         inner join account_move am on am.id = aml.move_id
@@ -140,7 +145,8 @@ class AccountauxiliaryWizard(models.Model):
             ('initial', _('Initial')),
             ('debit', _('Debit')),
             ('credit', _('Credit')),
-            ('final', _('Final'))
+            ('final', _('Final')),
+            ('state', _('Estado')),
         ]
 
         return report_header
