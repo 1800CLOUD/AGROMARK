@@ -120,7 +120,8 @@ class ReportInvoice(models.TransientModel):
                         rc2.name,
                         rc.name,
                         rp2.name,
-                        cm.name
+                        cm.name,
+                        am.move_type
                         
                     
                       ''')
