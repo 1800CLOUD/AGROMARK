@@ -53,15 +53,20 @@ class ReportInvoice(models.TransientModel):
         dt_to = str(self.date_to)
         cr.execute(f'''SELECT
                             so.date_order, 
-                            so.name, 
+                            so.name,
+                            am.name, 
                             aa.name,
                             pt.default_code,
                             pt.name,
                             pc.name,
                             pb.name,
                             uu.name,
-                            sol.product_uom_qty,
-                            sol.price_subtotal,
+                            CASE 
+                            WHEN am.move_type = 'out_refund' THEN aml.quantity * (-1)
+                            ELSE sol.product_uom_qty END,
+                            CASE
+                            WHEN am.move_type = 'out_refund' THEN aml.price_subtotal * (-1)
+                            ELSE sol.price_subtotal END,
                             rp.vat,
                             rp.name,
                             rc2.name,
@@ -76,6 +81,8 @@ class ReportInvoice(models.TransientModel):
                             INNER JOIN account_analytic_account aa ON so.analytic_account_id = aa.id
                             INNER JOIN product_product pp ON sol.product_id = pp.id
                             INNER JOIN product_template pt ON pt.id = pp.product_tmpl_id
+                            INNER JOIN account_move_line aml ON so.id = aml.order_sale_id AND pp.id = aml.product_id
+                            INNER JOIN account_move am ON aml.move_id = am.id
                             INNER JOIN product_category pc ON pt.categ_id = pc.id
                             INNER JOIN product_brand pb ON pt.product_brand_id = pb.id
                             INNER JOIN uom_uom uu ON pt.uom_id = uu.id                          
@@ -91,10 +98,12 @@ class ReportInvoice(models.TransientModel):
                             pt.detailed_type = 'product' AND
                             sol.product_uom_qty = sol.qty_invoiced AND
                             so.state = 'done' AND
+                            am.state = 'posted' AND
                             so.date_order BETWEEN   '{dt_from}' AND '{dt_to}' {wh}
                         
                         GROUP BY
                         so.name,
+                        am.name,
                         pc.name,
                         pt.default_code,
                         pt.name,
@@ -103,7 +112,9 @@ class ReportInvoice(models.TransientModel):
                         pb.name,
                         uu.name,
                         sol.product_uom_qty,
+                        aml.quantity,
                         sol.price_subtotal,
+                        aml.price_subtotal,
                         rp.vat,
                         rp.name,
                         rc2.name,
@@ -122,6 +133,7 @@ class ReportInvoice(models.TransientModel):
         titles = [
                 'Fecha', 
                 'Orden de venta', 
+                '# Factura',
                 'Cuenta', 
                 'Referencia Interna',
                 'Producto',
@@ -144,7 +156,7 @@ class ReportInvoice(models.TransientModel):
         titles_format = workbook.add_format()
         titles_format.set_align("center")
         titles_format.set_bold()
-        worksheet.set_column("A:P", 22)
+        worksheet.set_column("A:Q", 22)
         worksheet.set_row(0, 25)
         
         col_num = 0

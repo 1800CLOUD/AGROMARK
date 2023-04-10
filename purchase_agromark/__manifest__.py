@@ -11,7 +11,7 @@
     'website': 'http://www.1-800cloud.com',
     'category': 'Accounting/Accounting',
     'license': 'LGPL-3',
-    'version': '15.0.0.0.1',
+    'version': '15.0.0.0.2',
     'depends': [
         'account_baseline',
         'purchase_discount',
@@ -19,6 +19,6 @@
     ],
     'data': [
         # 'security/ir.model.access.csv',
-        # 'views/views.xml',
+        'views/account_move_views.xml',
     ],
 }
