@@ -6,6 +6,7 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     order_sale_id = fields.Many2one('sale.order', 'Orden de Venta', related='sale_line_ids.order_id', readonly=True, store=True, copy=False)
+    partner_vat = fields.Char('NIT', related='partner_id.vat', readonly=True)
 
     def _get_price_total_and_subtotal(self, price_unit=None, quantity=None, discount=None, currency=None, 
                                       product=None, partner=None, taxes=None, move_type=None):

@@ -11,7 +11,7 @@
     'website': 'http://www.1-800cloud.com',
     'category': 'Accounting/Accounting',
     'license': 'LGPL-3',
-    'version': '15.0.0.0.2',
+    'version': '15.0.0.0.3',
     'depends': [
         'account_baseline',
         'purchase_discount',
