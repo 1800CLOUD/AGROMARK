@@ -5,7 +5,7 @@
         <field name="inherit_id" ref="account_report.view_account_balance_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='accounts_ids']" position="after">
-                <field name="account_analityc_ids" widget="many2many_tags"/>
+               <!-- <field name="account_analityc_ids" widget="many2many_tags"/>-->
             </xpath>
         </field>
     </record>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="report_purchase_line_search" model="ir.ui.view">
+        <field name="name">report.purchase.line.search</field>
+        <field name="model">report.purchase.line</field>
+        <field name="arch" type="xml">
+            <search string="Reporte de Compras">
+                <group expand="0" string="Group By">
+                    <filter name="group_purchase_id" string="Compra" context="{'group_by':'purchase_id'}"/>
+                    <filter name="group_invoice_id" string="Factura" context="{'group_by':'invoice_id'}"/>
+                    <separator/>
+                    <filter name="group_journal_id" string="Diario" context="{'group_by':'journal_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="report_purchase_form" model="ir.ui.view">
+        <field name="name">report.purchase.form</field>
+        <field name="model">report.purchase</field>
+        <field name="arch" type="xml">
+            <form string="Informe Disponibilidad">
+                <sheet>
+                    <div class="oe_button_box">                        
+                        <button name="button_bi" type="object" class="oe_stat_button" icon="fa-sort-amount-asc" 
+                                string="Analizar" context="{'pivot': True}"/>
+                        <button name="get_xlsx_report" type="object" class="oe_stat_button" icon="fa-file-excel-o" string="Excel"/>
+                    </div>
+                    <h1>
+                        <strong>Informe de compras</strong>
+                    </h1>
+                     <group col="2" string="Fechas de Corte">
+                        <group colspan="1">
+                            <field name="date_from"/>
+                        </group>
+                        <group colspan="1">
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                    <group string="Filtros">
+                        <group string="Proveedores">
+                            <field name="partner_ids" widget="many2many_tags"/>
+                        </group>
+                        <div>
+                            <p attrs="{'invisible': [('xls_file', '=', False)]}" class="oe_inline" name="xls_file">
+                                Download the XLSX details file: <field name="xls_file" readonly="1" filename="xls_filename"/>
+                            </p>
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="report_purchase_line_tree" model="ir.ui.view">
+        <field name="name">report.purchase.line.tree</field>
+        <field name="model">report.purchase.line</field>
+        <field name="arch" type="xml">
+            <tree string="Disponibilidad Stock">
+                <field name="partner_vat"/>
+                <field name="partner_id"/>
+                <field name="purchase_id"/>
+                <field name="invoice_id"/>
+                <field name="journal_id"/>
+                <field name="amount_untaxed"/>
+                <field name="amount_total"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="report_purchase_line_pivot" model="ir.ui.view">
+        <field name="name">report.stock.quant.line.pivot</field>
+        <field name="model">report.purchase.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Disponibilidad Stock">
+                <field name="purchase_id" type="row"/>
+                <field name="amount_untaxed" type="measure"/>
+                <field name="amount_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_report_purchase" model="ir.actions.act_window">
+        <field name="name">Reporte de compras</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">report.purchase</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+
+</odoo>

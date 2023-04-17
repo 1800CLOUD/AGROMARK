@@ -6,6 +6,7 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     sale_id = fields.Many2one('sale.order', 'Orden de Venta', related='invoice_line_ids.sale_line_ids.order_id', readonly=True, store=True, copy=False)
+    order_purchase_id = fields.Many2one('purchase.order', 'Orden de compra', related='invoice_line_ids.purchase_line_id.order_id', readonly=True, store=True, copy=False)
 
     def _recompute_tax_lines(self, recompute_tax_base_amount=False, tax_rep_lines_to_recompute=None):
         if self.move_type in ('in_invoice', 'in_refund'):
