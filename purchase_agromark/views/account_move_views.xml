@@ -10,6 +10,9 @@
                     <xpath expr="//group[@name='sale_info_group']/field[@name='invoice_user_id']" position="before">
                         <field name="sale_id" attrs="{'invisible': [('sale_id', '=', False)]}"/>
                     </xpath>
+                    <xpath expr="//group[@name='accounting_info_group']/field[@name='fiscal_position_id']" position="after">
+                        <field name="order_purchase_id" attrs="{'invisible': [('order_purchase_id', '=', False)]}"/>
+                    </xpath>
                 </data>
             </field>
         </record>
