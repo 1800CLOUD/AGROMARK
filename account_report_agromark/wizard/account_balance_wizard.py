@@ -15,7 +15,7 @@ class AccountaBalanceWizard(models.Model):
    _inherit = 'account.balance.wizard'
 
    account_analityc_ids = fields.Many2many(comodel_name='account.analytic.account',
-                                   string='Accounts')
+                                   string='Analytic accounts')
 
 
 
