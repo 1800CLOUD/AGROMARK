@@ -89,7 +89,7 @@ class AccountauxiliaryWizard(models.Model):
                 WHEN am.state = 'draft' THEN 'Borrador'
                 WHEN am.state = 'posted' THEN 'Publicado'
                 WHEN am.state = 'cancel' THEN 'Cancelado'
-            ELSE 'N/A' END
+            ELSE 'N/A' END as state
         from account_move_line aml
         inner join account_account aa on aa.id = aml.account_id
         inner join account_move am on am.id = aml.move_id
@@ -120,6 +120,55 @@ class AccountauxiliaryWizard(models.Model):
         query += """
         order by aa.code, rp.name, aml.date
         """
+        if self.partner_by and 1 == 0:
+            query = query.replace(
+                "'' as initial",
+                '''coalesce((
+                    select sum(aml2.{debit} - aml2.{credit})
+                    from account_move_line as aml2
+                    inner join account_move am2 on am2.id = aml2.move_id
+                    where aml2.account_id = aa.id
+                    and (
+                        aml2.partner_id = aml.partner_id
+                        or
+                        (
+                            aml2.partner_id is null
+                            and
+                            aml.partner_id is null
+                        )
+                    )
+                    and aml2.date < '{date_start}'
+                    {where2}
+                ), 0) as initial
+                '''
+            ).replace(
+                "'' as final",
+                '''coalesce((
+                select sum(aml2.{debit} - aml2.{credit})
+                from account_move_line as aml2
+                inner join account_move am2 on am2.id = aml2.move_id
+                where aml2.account_id = aa.id
+                and (
+                    aml2.partner_id = aml.partner_id
+                    or
+                    (
+                        aml2.partner_id is null
+                        and
+                        aml.partner_id is null
+                    )
+                )
+                and aml2.date <= '{date_end}'
+                {where2}
+            ), 0) as final
+                '''
+            ).format(
+                credit=self.report_type == 'local' and 'credit' or 'ifrs_credit',
+                debit=self.report_type == 'local' and 'debit' or 'ifrs_debit',
+                date_start=self.date_from,
+                date_end=self.date_to,
+                where=self._get_query_where(),
+                where2=self._get_query_where2()
+            )
         return query
     
     def prepare_header(self):
@@ -161,4 +210,15 @@ class AccountauxiliaryWizard(models.Model):
         res = super(AccountauxiliaryWizard, self).prepare_data_acc()
         res = res.replace("'' as journal,", 
                           "'' as journal,\n '' as analytic,")
+        return res
+
+    def prepare_data_rp(self):
+        res = super(AccountauxiliaryWizard, self).prepare_data_rp()
+        res = res.replace(
+            "'' as journal,",
+            "'' as journal,\n '' as analytic,"
+            ).replace(
+                "as final",
+                "as final, '' as state"
+            )
         return res
