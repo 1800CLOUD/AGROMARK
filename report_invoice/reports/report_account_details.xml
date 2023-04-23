@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_account_details">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="report_invoice.report_invoices_details_document" t-lang="doc.user_id.lang" />
+            </t>
+        </t>
+    </template>
+
+    <template id="report_invoices_details_document">
+        <t t-set="company" t-value="env.company" />
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <div class="text-center">
+                            <h2>Detalle de Facturas</h2>
+                            <strong>
+                                <span t-field="o.date_start" t-options="{'widget': 'date'}" />
+                                -
+                                <span t-field="o.date_end" t-options="{'widget': 'date'}" />
+                            </strong>
+                        </div><!---->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr />
+                                <table class="table-condensed tabla">
+                                    <tr>
+                                        <td>
+                                            <p>
+                                                <b>
+                                                    NOMBRE:
+                                                </b>
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <p>
+                                                <span t-field="company.name"/> 
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <p>
+                                                <b>
+                                                    NIT: 
+                                                </b>
+                                            </p>
+                                        </td>
+                                        <td>
+                                            <p>
+                                                <span t-field="company.vat"/>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <h3>FACTURA ELECTRONICA IBAGUE</h3>
+                        <table class="table table-sm">
+                            <thead>
+                                <t t-set="start_invoice_number" t-value="0" />
+                                <t t-set="end_invoice_number" t-value="0" />
+                                <tr>
+                                    <th>Factura</th>
+                                    <th>Antes de Impuesto</th>
+                                    <th>IVA</th>
+                                    <th>Valor total</th>
+                                    <th>Total Facturas</th>
+                                    <th>Número de factura de inicio</th>
+                                    <th>Número de factura final</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="start_date" t-value="o.date_start"></t>
+                                <t t-set="end_date" t-value="o.date_end"></t>
+                                <t t-set="price_subtotal" t-value="0" />
+                                <t t-foreach="o.moves_ids.filtered(lambda x: x.fe_datetime_invoice.date() &gt;= start_date and x.fe_datetime_invoice.date() &lt;= end_date)" t-as="moves">
+                                    <t t-if="start_invoice_number == 0 or moves.name &lt; start_invoice_number">
+                                        <t t-if="moves.journal_id.name == 'FACTURA ELECTRONICA IBAGUE'">
+                                            <t t-set="start_invoice_number" t-value="moves.name" />
+                                        </t>
+                                    </t>
+                                    <t t-if="end_invoice_number == 0 or moves.name &gt; end_invoice_number">
+                                        <t t-if="moves.journal_id.name == 'FACTURA ELECTRONICA IBAGUE'">
+                                            <t t-set="end_invoice_number" t-value="moves.name" />
+                                        </t>
+                                    </t>
+                                </t>
+                                <tr t-foreach="o.moves_ids" t-as="move">
+                                    <t t-if="move.journal_id.name == 'FACTURA ELECTRONICA IBAGUE'">
+                                        <t t-set="price_subtotal" t-value="price_subtotal + move.amount_total" />
+                                        <td>
+                                            <!-- <span t-field="line.product_id" /> -->
+                                            <span t-field="move.name" />
+                                        </td>
+                                        <td>
+                                            <span t-field="move.amount_untaxed"/>
+                                        </td>
+                                        <td>
+                                            <t t-set="total_taxes" t-value="0"/>
+                                            <t t-foreach="move.invoice_line_ids" t-as="line"> 
+                                                <t t-foreach="line.tax_ids" t-as="tax">
+                                                    <t t-if="tax.dian_tax_type_id.dian_code == '01'">
+                                                        <t t-set="total_taxes" t-value="total_taxes + ((line.price_subtotal * tax.amount)/100)"/>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                            <t t-esc="total_taxes" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="move.amount_total" />
+                                        </td>
+                                    </t>
+                                </tr>
+                                <tr>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td>
+                                        <t t-esc="price_subtotal" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                    <td><t t-esc="start_invoice_number"/></td>
+                                    <td><t t-esc="end_invoice_number"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <h3>FACTURACION ELECTRONICA NEIVA</h3>
+                        <table class="table table-sm">
+                            <thead>
+                                <t t-set="start_invoice_number_neiva" t-value="0" />
+                                <t t-set="end_invoice_number_neiva" t-value="0" />
+                                <tr>
+                                    <th>Factura</th>
+                                    <th>Antes de Impuesto</th>
+                                    <th>IVA</th>
+                                    <th>Valor total</th>
+                                    <th>Total Facturas</th>
+                                    <th>Número de factura de inicio</th>
+                                    <th>Número de factura final</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="start_date_neiva" t-value="o.date_start"></t>
+                                <t t-set="end_date_neiva" t-value="o.date_end"></t>
+                                <t t-set="price_subtotal" t-value="0" />
+                                <t t-foreach="o.moves_ids.filtered(lambda x: x.fe_datetime_invoice.date() &gt;= start_date_neiva and x.fe_datetime_invoice.date() &lt;= end_date_neiva)" t-as="movn">
+                                    <t t-if="start_invoice_number_neiva == 0 or movn.name &lt; start_invoice_number_neiva">
+                                        <t t-if="movn.journal_id.name == 'FACTURACION ELECTRONICA NEIVA'">
+                                            <t t-set="start_invoice_number_neiva" t-value="movn.name" />
+                                        </t>
+                                    </t>
+                                    <t t-if="end_invoice_number_neiva == 0 or movn.name &gt; end_invoice_number_neiva">
+                                        <t t-if="movn.journal_id.name == 'FACTURACION ELECTRONICA NEIVA'">
+                                            <t t-set="end_invoice_number_neiva" t-value="movn.name" />
+                                        </t>
+                                    </t>
+                                </t>
+                                <tr t-foreach="o.moves_ids" t-as="move">
+                                    <t t-if="move.journal_id.name == 'FACTURACION ELECTRONICA NEIVA'">
+                                        <t t-set="price_subtotal" t-value="price_subtotal + move.amount_total" />
+
+                                        <td>
+                                            <!-- <span t-field="line.product_id" /> -->
+                                            <span t-field="move.name" />
+                                        </td>
+                                        <td>
+                                            <span t-field="move.amount_untaxed"/>
+                                        </td>
+                                        <td>
+                                            <t t-set="total_taxes" t-value="0"/>
+                                            <t t-foreach="move.invoice_line_ids" t-as="line"> 
+                                                <t t-foreach="line.tax_ids" t-as="tax">
+                                                    <t t-if="tax.dian_tax_type_id.dian_code == '01'">
+                                                        <t t-set="total_taxes" t-value="total_taxes + ((line.price_subtotal * tax.amount)/100)"/>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                            <t t-esc="total_taxes" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="move.amount_total" />
+                                        </td>
+                                    </t>
+                                </tr>
+                                <tr>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td>
+                                        <t t-esc="price_subtotal" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                    <td><t t-esc="start_invoice_number_neiva"/></td>
+                                    <td><t t-esc="end_invoice_number_neiva"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <h3>FACTURACION ELECTRONICA ESPINAL</h3>
+                        <table class="table table-sm">
+                            <thead>
+                                <t t-set="start_invoice_number_espinal" t-value="0" />
+                                <t t-set="end_invoice_number_espinal" t-value="0" />
+                                <tr>
+                                    <th>Factura</th>
+                                    <th>Antes de Impuesto</th>
+                                    <th>IVA</th>
+                                    <th>Valor total</th>
+                                    <th>Total Facturas</th>
+                                    <th>Número de factura de inicio</th>
+                                    <th>Número de factura final</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="start_date_espinal" t-value="o.date_start"></t>
+                                <t t-set="end_date_espinal" t-value="o.date_end"></t>
+                                <t t-set="price_subtotal" t-value="0" />
+                                <t t-foreach="o.moves_ids.filtered(lambda x: x.fe_datetime_invoice.date() &gt;= start_date_espinal and x.fe_datetime_invoice.date() &lt;= end_date_espinal)" t-as="movesn">
+                                    <t t-if="start_invoice_number_espinal == 0 or movesn.name &lt; start_invoice_number_espinal">
+                                        <t t-if="movesn.journal_id.name == 'FACTURACION ELECTRONICA ESPINAL'">
+                                            <t t-set="start_invoice_number_espinal" t-value="movesn.name" />
+                                        </t>
+                                    </t>
+                                    <t t-if="end_invoice_number_espinal == 0 or movesn.name &gt; end_invoice_number_espinal">
+                                        <t t-if="movesn.journal_id.name == 'FACTURACION ELECTRONICA ESPINAL'">
+                                            <t t-set="end_invoice_number_espinal" t-value="movesn.name" />
+                                        </t>
+                                    </t>
+                                </t>
+                                <tr t-foreach="o.moves_ids" t-as="move">
+                                    <t t-if="move.journal_id.name == 'FACTURACION ELECTRONICA ESPINAL'">
+                                        <t t-set="price_subtotal" t-value="price_subtotal + move.amount_total" />
+
+                                        <td>
+                                            <!-- <span t-field="line.product_id" /> -->
+                                            <span t-field="move.name" />
+                                        </td>
+                                        <td>
+                                            <span t-field="move.amount_untaxed"/>
+                                        </td>
+                                        <td>
+                                            <t t-set="total_taxes" t-value="0"/>
+                                            <t t-foreach="move.invoice_line_ids" t-as="line"> 
+                                                <t t-foreach="line.tax_ids" t-as="tax">
+                                                    <t t-if="tax.dian_tax_type_id.dian_code == '01'">
+                                                        <t t-set="total_taxes" t-value="total_taxes + ((line.price_subtotal * tax.amount)/100)"/>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                            <t t-esc="total_taxes" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="move.amount_total" />
+                                        </td>
+                                    </t>
+                                </tr>
+                                <tr>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td/>
+                                    <td>
+                                        <t t-esc="price_subtotal" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}" />
+                                    </td>
+                                    <td><t t-esc="start_invoice_number_espinal"/></td>
+                                    <td><t t-esc="end_invoice_number_espinal"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
