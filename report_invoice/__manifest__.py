@@ -18,7 +18,7 @@
         'account',
     ],
     'data': [
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'reports/report_invoice.xml',
         'views/menuitem_views.xml',
         'reports/account_details_report.xml',
