@@ -58,13 +58,14 @@
         <field name="name">report.purchase.line.tree</field>
         <field name="model">report.purchase.line</field>
         <field name="arch" type="xml">
-            <tree string="Disponibilidad Stock">
+            <tree string="Facturas de compra">
                 <field name="partner_vat"/>
                 <field name="partner_id"/>
                 <field name="purchase_id"/>
                 <field name="invoice_id"/>
                 <field name="journal_id"/>
                 <field name="amount_untaxed"/>
+                <field name="tax_id"/>
                 <field name="amount_total"/>
             </tree>
         </field>
@@ -74,7 +75,7 @@
         <field name="name">report.stock.quant.line.pivot</field>
         <field name="model">report.purchase.line</field>
         <field name="arch" type="xml">
-            <pivot string="Disponibilidad Stock">
+            <pivot string="Facturas de compra">
                 <field name="purchase_id" type="row"/>
                 <field name="amount_untaxed" type="measure"/>
                 <field name="amount_total" type="measure"/>

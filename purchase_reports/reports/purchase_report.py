@@ -52,20 +52,46 @@ class ReportPurchase(models.TransientModel):
             
         qry = f'''
             INSERT INTO report_purchase_line (partner_vat, partner_id, purchase_id, invoice_id, journal_id, amount_untaxed,
-                        amount_total, create_date, write_date)
+                        tax_id, amount_total, create_date, write_date)
                 SELECT
-                    rp.vat, po.partner_id, am.order_purchase_id, am.
-                    id,  am.journal_id, am.amount_untaxed,
-                    am.amount_total, '{dt_now}', '{dt_now}'
+                    rp.vat, 
+                    po.partner_id, 
+                    am.order_purchase_id, 
+                    am.id,  
+                    am.journal_id, 
+                    CASE 
+                    WHEN am.move_type = 'in_refund' THEN am.amount_untaxed * (-1)
+                    ELSE am.amount_untaxed END,
+                    at.id,
+                    CASE
+                    WHEN am.move_type = 'in_refund' THEN am.amount_total * (-1)
+                    ELSE am.amount_total END,
+                    '{dt_now}', 
+                    '{dt_now}'
+
                 FROM
                     purchase_order po
                     INNER JOIN account_move am ON po.id = am.order_purchase_id
                     INNER JOIN account_journal aj ON am.journal_id = aj.id
                     INNER JOIN res_partner rp ON po.partner_id = rp.id
+                    LEFT JOIN account_move_line aml ON am.id = aml.move_id
+                    LEFT JOIN account_tax at ON aml.tax_line_id = at.id 
+        
 
                 WHERE
+                    am.state = 'posted' AND
                     am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}'
                     {wh}
+                GROUP BY 
+                rp.vat,
+                po.partner_id, 
+                am.id,  
+                am.journal_id, 
+                aj.name,
+                am.move_type,
+                am.amount_untaxed,
+                at.id,
+                am.amount_total
         '''
         cr.execute(qry)
         
@@ -85,23 +111,44 @@ class ReportPurchase(models.TransientModel):
             wh += _add_where('rp', 'partner_id', self.partner_ids)
 
         
-        excel_qry = f'''            SELECT 
+        excel_qry = f'''            
+            SELECT 
                 rp.vat, 
                 rp.name, 
                 po.name, 
                 am.name, 
                 aj.name, 
-                am.amount_untaxed, 
-                am.amount_total
+                CASE 
+                WHEN am.move_type = 'in_refund' THEN am.amount_untaxed * (-1)
+                ELSE am.amount_untaxed END,
+                STRING_AGG(at.description, ';'),
+                CASE
+                WHEN am.move_type = 'in_refund' THEN am.amount_total * (-1)
+                ELSE am.amount_total END
+        
             FROM
                 report_purchase_line rpl
                 INNER JOIN purchase_order po ON rpl.purchase_id = po.id
                 LEFT JOIN res_partner rp ON rpl.partner_id = rp.id
                 LEFT JOIN account_move am ON rpl.invoice_id = am.id
+                LEFT JOIN account_move_line aml ON am.id = aml.move_id
+                LEFT JOIN account_tax at ON aml.tax_line_id = at.id 
+                LEFT JOIN dian_tax_type dt ON at.dian_tax_type_id = dt.id 
                 LEFT JOIN account_journal aj ON rpl.journal_id = aj.id
+
             WHERE 
+                am.state = 'posted' AND
                 am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}'
                 {wh}
+            GROUP BY 
+                rp.vat,
+                rp.name,
+                po.name,
+                am.name,
+                aj.name,
+                am.move_type,
+                am.amount_untaxed,
+                am.amount_total
         '''
         cr.execute(excel_qry)
         result = cr.fetchall()
@@ -117,6 +164,7 @@ class ReportPurchase(models.TransientModel):
                   'FACTURA',
                   'DIARIO', 
                   'VALOR A. IMPUESTO', 
+                  'TARIFA IMPUESTO',
                   'VALOR TOTAL'
                   ]
     
@@ -185,5 +233,6 @@ class ReportPurchaseLine(models.Model):
     purchase_id = fields.Many2one('purchase.order', 'Orden de compra', copy=False, readonly=True, required=True)
     journal_id = fields.Many2one('account.journal', 'Diario', copy=False, readonly=True, required=True)
     amount_untaxed = fields.Float('Valor A. impuesto', copy=False, readonly=True, required=True)
+    tax_id = fields.Many2one('account.tax', 'Impuesto', copy=False, readonly=True, index=True )
     amount_total = fields.Float('Valor total', copy=False, readonly=True, required=True)
     

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_invoice_details_wizard" model="ir.actions.report">
+        <field name="name">Detalle de Facturacion</field>
+        <field name="model">invoice.detail.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">report_invoice.report_invoices_details_document</field>
+    </record>
+</odoo>
