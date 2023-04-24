@@ -55,7 +55,7 @@
                                 </table>
                             </div>
                         </div>
-                        <h3>FACTURA ELECTRONICA IBAGUE</h3>
+                        <h3>FACTURACION ELECTRONICA IBAGUE</h3>
                         <table class="table table-sm">
                             <thead>
                                 <t t-set="start_invoice_number" t-value="0" />
