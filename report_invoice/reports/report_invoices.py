@@ -62,11 +62,11 @@ class ReportInvoice(models.TransientModel):
                             pb.name,
                             uu.name,
                             CASE 
-                            WHEN am.move_type = 'out_refund' THEN aml.quantity * (-1)
-                            ELSE sol.product_uom_qty END,
+                            WHEN am.move_type = 'out_refund' THEN sol.qty_invoiced * (-1)
+                            ELSE sol.qty_invoiced END,
                             CASE
-                            WHEN am.move_type = 'out_refund' THEN aml.price_subtotal * (-1)
-                            ELSE sol.price_subtotal END,
+                            WHEN am.move_type = 'out_refund' THEN (sol.qty_invoiced * sol.price_unit) * (-1)
+                            ELSE sol.price_unit * sol.qty_invoiced END,
                             rp.vat,
                             rp.name,
                             rc2.name,
@@ -96,10 +96,10 @@ class ReportInvoice(models.TransientModel):
 
                         WHERE
                             pt.detailed_type = 'product' AND
-                            sol.product_uom_qty = sol.qty_invoiced AND
+                            sol.qty_delivered = sol.qty_invoiced AND
                             so.state = 'done' AND
                             am.state = 'posted' AND
-                            so.date_order BETWEEN   '{dt_from}' AND '{dt_to}' {wh}
+                            am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}' {wh}
                         
                         GROUP BY
                         so.name,
@@ -111,10 +111,8 @@ class ReportInvoice(models.TransientModel):
                         aa.name,
                         pb.name,
                         uu.name,
-                        sol.product_uom_qty,
-                        aml.quantity,
-                        sol.price_subtotal,
-                        aml.price_subtotal,
+                        sol.qty_invoiced,
+                        sol.price_unit,
                         rp.vat,
                         rp.name,
                         rc2.name,
