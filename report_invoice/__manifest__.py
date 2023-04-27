@@ -11,7 +11,7 @@
     'website': 'https://1-800cloud.com',
     'category': 'sales/sale',
     'license': 'LGPL-3',
-    'version': '15.0.0.0.7',
+    'version': '15.0.0.0.8',
     'depends': [
         'base_setup',
         'account_baseline',
