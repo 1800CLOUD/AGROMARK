@@ -96,7 +96,6 @@ class ReportInvoice(models.TransientModel):
 
                         WHERE
                             pt.detailed_type = 'product' AND
-                            am.move_type = 'out_invoice' AND
                             so.state = 'done' AND
                             am.state = 'posted' AND
                             am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}' {wh}
