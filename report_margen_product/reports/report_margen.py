@@ -16,8 +16,8 @@ class ReportInvoice(models.TransientModel):
     _description = 'Reporte de margen de productos'
     
     name = fields.Char('Nombre', default='Informe de Margen de Producto', readonly=True)
-    date_from = fields.Datetime('Desde', required=True, default=(fields.Datetime.now() - relativedelta(month=1)))
-    date_to = fields.Datetime('Hasta', required=True, default=(fields.Datetime.now()).date())
+    date_from = fields.Date('Desde', required=True, default=(fields.Date.today() - relativedelta(month=1)))
+    date_to = fields.Date('Hasta', required=True, default=(fields.Date.today()))
     product_ids = fields.Many2many('product.product', string='Productos', copy=False) 
     brand_ids = fields.Many2many('product.brand', string='Marcas')
     xls_file = fields.Binary(string="XLS file")
@@ -39,36 +39,30 @@ class ReportInvoice(models.TransientModel):
         dt_from = str(self.date_from)
         dt_to = str(self.date_to)
         cr.execute(f'''SELECT
-                            DISTINCT pt.name, 
+                            pt.name, 
                             pt.default_code,
-                            pb.name,
-                            SUM(sol.product_uom_qty),
-                            SUM(sol.price_subtotal),
-                            SUM(svl.unit_cost*sol.product_uom_qty),
-                            SUM(sol.price_subtotal) - SUM(svl.unit_cost*sol.product_uom_qty),
-                            ((SUM(sol.price_subtotal) - SUM(svl.unit_cost*sol.product_uom_qty)) / SUM(sol.price_subtotal)),
-                            ((SUM(sol.price_subtotal) - SUM(svl.unit_cost*sol.product_uom_qty)) / (SUM(svl.unit_cost*sol.product_uom_qty)))
+                            SUM(aml.quantity * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) AS num_qty,
+                            SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END))
                             
 
-                        FROM sale_order_line sol
-                            INNER JOIN sale_order so ON sol.order_id = so.id 
-                            INNER JOIN product_product pp ON sol.product_id = pp.id 
+                        FROM account_move_line aml
+                            INNER JOIN account_move am ON aml.move_id = am.id
+                            INNER JOIN product_product pp ON aml.product_id = pp.id
                             INNER JOIN product_template pt ON pt.id = pp.product_tmpl_id
-                            INNER JOIN product_brand pb ON pb.id = pt.product_brand_id
-                            INNER JOIN stock_move sm ON sol.id = sm.sale_line_id 
-                            INNER JOIN stock_valuation_layer svl ON sm.id = svl.stock_move_id
+                            
 
 
                         WHERE
+                            am.move_type IN ('out_invoice', 'out_refund') AND
                             pt.detailed_type = 'product' AND 
-                            sol.product_uom_qty = sol.qty_invoiced AND
-                            so.state = 'done' AND
-                            so.date_order BETWEEN   '{dt_from}' AND '{dt_to}' 
+                            am.state = 'posted' AND
+                            am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}' 
                             {wh}
                         GROUP BY 
                         pt.name,
-                        pt.default_code,
-                        pb.name
+                        pt.default_code
+                        
+                        
                         
                       ''')
         result = cr.fetchall()
