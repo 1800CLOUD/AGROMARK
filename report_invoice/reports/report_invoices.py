@@ -62,11 +62,11 @@ class ReportInvoice(models.TransientModel):
                             pb.name,
                             uu.name,
                             CASE 
-                            WHEN am.move_type = 'out_refund' THEN aml.quantity * (-1)
-                            ELSE aml.quantity END AS total_quantity,
+                                WHEN am.move_type = 'out_refund' THEN aml.quantity * (-1)
+                                ELSE aml.quantity END AS total_quantity,
                             CASE
-                            WHEN am.move_type = 'out_refund' THEN aml.price_subtotal * (-1)
-                            ELSE aml.price_subtotal END AS total_price_subtotal,
+                                WHEN am.move_type = 'out_refund' THEN aml.price_subtotal * (-1)
+                                ELSE aml.price_subtotal END AS total_price_subtotal,
                             rp.vat,
                             rp.name,
                             rc2.name,
@@ -118,7 +118,8 @@ class ReportInvoice(models.TransientModel):
                         cm.name,
                         am.move_type,
                         aml.quantity,
-                        aml.price_subtotal
+                        aml.price_subtotal,
+                        aml.id
                         
                     
                       ''')
