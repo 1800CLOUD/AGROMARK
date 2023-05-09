@@ -160,7 +160,7 @@ class ReportPurchase(models.TransientModel):
                 aj.name,  
                 pt.default_code,
                 pt.name,
-                aa.name, 
+                aa.code, 
                 aml.balance,
                 at.tax,
                 at.value,
