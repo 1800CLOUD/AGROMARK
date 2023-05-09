@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 report_invoice.access_invoice_detail_wizard,access_invoice_detail_wizard,report_invoice.model_invoice_detail_wizard,,1,0,0,0
+
+report_invoice.access_report_invoice,access_report_invoice,report_invoice.model_report_invoice,,1,1,1,1
+report_invoice.access_invoice_report_line,access_invoice_report_line,report_invoice.model_invoice_report_line,,1,1,1,1

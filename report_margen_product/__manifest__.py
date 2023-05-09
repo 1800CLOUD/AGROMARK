@@ -11,7 +11,7 @@
     'website': 'https://1-800cloud.com',
     'category': 'sales/sale',
     'license': 'LGPL-3',
-    'version': '15.0.0.0.4',
+    'version': '15.0.0.0.6',
     'depends': [
         'product_brand',
         'Stock_Agromark',
@@ -19,7 +19,7 @@
         'sale'
     ],
     'data': [
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'reports/report_margen.xml',
         'views/menuitem_views.xml',
     ],
