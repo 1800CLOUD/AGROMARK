@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="report_purchase_line_search" model="ir.ui.view">
-        <field name="name">report.purchase.line.search</field>
-        <field name="model">report.purchase.line</field>
-        <field name="arch" type="xml">
-            <search string="Reporte de Compras">
-                <group expand="0" string="Group By">
-                    <filter name="group_purchase_id" string="Compra" context="{'group_by':'purchase_id'}"/>
-                    <filter name="group_invoice_id" string="Factura" context="{'group_by':'invoice_id'}"/>
-                    <separator/>
-                    <filter name="group_journal_id" string="Diario" context="{'group_by':'journal_id'}"/>
-                </group>
-            </search>
-        </field>
-    </record>
-
     <record id="report_purchase_form" model="ir.ui.view">
         <field name="name">report.purchase.form</field>
         <field name="model">report.purchase</field>
@@ -54,32 +39,49 @@
     </record>
 
 
+    <record id="report_purchase_line_pivot" model="ir.ui.view">
+        <field name="name">report.purchase.line.pivot</field>
+        <field name="model">report.purchase.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Facturas de compra">
+                <field name="invoice_date" type="row"/>
+                <field name="amount_untaxed" type="measure"/>
+                <field name="amount_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="report_purchase_line_tree" model="ir.ui.view">
         <field name="name">report.purchase.line.tree</field>
         <field name="model">report.purchase.line</field>
         <field name="arch" type="xml">
             <tree string="Facturas de compra">
-                <field name="partner_vat"/>
-                <field name="partner_id"/>
-                <field name="purchase_id"/>
-                <field name="invoice_id"/>
-                <field name="journal_id"/>
-                <field name="amount_untaxed"/>
-                <field name="tax_id"/>
-                <field name="amount_total"/>
+                <field name="invoice_date" optional="show"/>
+                <field name="partner_id" optional="show"/>
+                <field name="purchase_id" optional="show"/>
+                <field name="invoice_id" optional="show"/>
+                <field name="journal_id" optional="hide"/>
+                <field name="default_code" optional="hide"/>
+                <field name="amount_untaxed" sum="total" widget="monetary"/>
+                <field name="tax_id" optional="hide"/>
+                <field name="value_tax" sum="total" widget="monetary"/>
+                <field name="amount_total" sum="total"/>
             </tree>
         </field>
     </record>
 
-    <record id="report_purchase_line_pivot" model="ir.ui.view">
-        <field name="name">report.stock.quant.line.pivot</field>
+    <record id="report_purchase_line_search" model="ir.ui.view">
+        <field name="name">report.purchase.line.search</field>
         <field name="model">report.purchase.line</field>
         <field name="arch" type="xml">
-            <pivot string="Facturas de compra">
-                <field name="purchase_id" type="row"/>
-                <field name="amount_untaxed" type="measure"/>
-                <field name="amount_total" type="measure"/>
-            </pivot>
+            <search string="Reporte de Compras">
+                <group expand="0" string="Group By">
+                    <filter name="group_purchase_id" string="Compra" context="{'group_by':'purchase_id'}"/>
+                    <filter name="group_invoice_id" string="Factura" context="{'group_by':'invoice_id'}"/>
+                    <separator/>
+                    <filter string="Fecha Factura" name="invoice_date" context="{'group_by':'invoice_date'}"/>
+                </group>
+            </search>
         </field>
     </record>
 

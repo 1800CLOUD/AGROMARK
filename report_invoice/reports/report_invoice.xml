@@ -38,16 +38,91 @@
                 </form>
             </field>
         </record>
+        
+        <record id="view_account_invoice_report_line_pivot" model="ir.ui.view">
+            <field name="name">account.invoice.report.pivot</field>
+            <field name="model">invoice.report.line</field>
+            <field name="arch" type="xml">
+                <pivot string="Analisis de Facturados" sample="1">
+                    <field name="product_id" type="col"/>
+                    <field name="invoice_date" type="row"/>
+                    <field name="price_subtotal" type="measure"/>
+                </pivot>
+            </field>
+        </record>
 
-        <record id="view_invoice_report_pivot" model="ir.ui.view">
-                 <field name="name">invoice.report.pivot</field>
-                 <field name="model">account.move.line</field>
-                 <field name="arch" type="xml">
-                     <pivot string="Invoices Analysis" sample="1">
-                         <field name="product_id" type="measure"/>
-                         <field name="partner_id" type="measure"/>
-                     </pivot>
-                 </field>
+        <record id="account_invoice_report_view_line_tree" model="ir.ui.view">
+            <field name="name">account.invoice.report.view.tree</field>
+            <field name="model">invoice.report.line</field>
+            <field name="arch" type="xml">
+                <tree string="Invoices Analysis">
+                   <field name="move_id" string="# Factura"/>
+                   <field name="sale_id" optional="hide"/>
+                   <field name="partner_id" optional="show"/>
+                   <field name="partner_vat" optional="hide"/>
+                   <field name="city_partner_id" optional="hide"/>
+                   <field name="invoice_date" optional="show"/>
+                   <field name="invoice_user_id" optional="hide" widget="many2one_avatar_user"/>
+                   <field name="categ_id" optional="hide"/>
+                   <field name="analytic_account_id" optional="hide"/>
+                   <field name="product_id" optional="show"/>                
+                   <field name="default_code" optional="hide"/>              
+                   <field name="product_uom_id" optional="hide"/>                      
+                   <field name="product_brand_id" optional="hide"/>                      
+                   <field name="quantity" optional="hide" sum="Total"/>
+                   <field name="price_subtotal" optional="show" sum="Total"/>
+                   <field name="partner_vat" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="filter_invoice_report_vendedors" model="ir.filters">
+            <field name="name">Vendedores</field>
+            <field name="model_id">invoice.report.line</field>
+            <field name="domain">[]</field>
+            <field name="user_id" eval="False"/>
+            <field name="context">{'group_by': ['invoice_date:month', 'invoice_user_id']}</field>
+        </record>
+        <record id="filter_invoice_products" model="ir.filters">
+            <field name="name">Producto</field>
+            <field name="model_id">invoice.report.line</field>
+            <field name="domain">[]</field>
+            <field name="user_id" eval="False"/>
+            <field name="context">{'group_by': ['invoice_date:month', 'product_id'], 'set_visible':True, 'residual_invisible':True}</field>
+        </record>
+        <record id="filter_invoice_category" model="ir.filters">
+            <field name="name">Categoria de producto</field>
+            <field name="model_id">invoice.report.line</field>
+            <field name="domain">[]</field>
+            <field name="user_id" eval="False"/>
+            <field name="context">{'group_by': ['invoice_date:month', 'categ_id'], 'residual_invisible':True}</field>
+        </record>
+
+        
+        <record id="view_account_invoice_report_line_search" model="ir.ui.view">
+            <field name="name">account.invoice.report.line.search</field>
+            <field name="model">invoice.report.line</field>
+            <field name="arch" type="xml">
+                <search string="Analisis Facturados">
+                    <separator/>
+                    <field name="invoice_date"/>
+                    <separator/>
+                    <filter name="filter_invoice_date" date="invoice_date"/>
+                    <filter string="Cuenta analítica" name="Analytic Account" context="{'group_by':'analytic_account_id'}"/>
+                    <field name="partner_id" operator="child_of"/>
+                    <field name="invoice_user_id" />
+                    <field name="product_id" />
+                    <field name="categ_id" filter_domain="[('categ_id', 'child_of', self)]"/>
+                    <group expand="1" string="Group By">
+                        <filter string="Vendedor" name='user' context="{'group_by':'invoice_user_id'}"/>
+                        <filter string="Cliente" name="partner_id" context="{'group_by':'partner_id','residual_visible':True}"/>
+                        <filter string="Categoria producto" name="category_product" context="{'group_by':'categ_id','residual_invisible':True}"/>
+                        <filter string="Marca" name='product_brand_id' context="{'group_by':'product_brand_id'}"/>
+                        <separator orientation="vertical" />
+                        <filter string="Fecha Factura" name="invoice_date" context="{'group_by':'invoice_date'}"/>
+                    </group>
+                </search>
+            </field>
         </record>
 
         <record id="action_report_invoice" model="ir.actions.act_window">
