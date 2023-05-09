@@ -302,7 +302,7 @@ class ReportPurchaseLine(models.Model):
     default_code = fields.Char('Referencia Interna', copy=False, readonly=True, index=True)
     invoice_id = fields.Many2one('account.move', string="Factura", copy=False, readonly=True)
     purchase_id = fields.Many2one('purchase.order', 'Orden de compra', copy=False, readonly=True)
-    product_id = fields.Many2one('porduct.product', 'Producto', copy=False, readonly=True)
+    product_id = fields.Many2one('product.product', 'Producto', copy=False, readonly=True)
     journal_id = fields.Many2one('account.journal', 'Diario', copy=False, readonly=True)
     account_id = fields.Many2one('account.account', 'Cuenta', copy=False, readonly=True)
     amount_untaxed = fields.Float('Valor A. impuesto', copy=False, readonly=True)

@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_report_invoice,report_invoice.report_invoice,model_report_invoice_report_invoice,base.group_user,1,1,1,1
+
+
+report_margen_product.access_margen_report_product,margen.report.product,report_margen_product.model_report_margen_product,,1,1,1,1
+report_margen_product.access_margen_report_line,access_margen_report_line,report_margen_product.model_margen_report_line,,1,1,1,1

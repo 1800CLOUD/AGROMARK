@@ -19,7 +19,7 @@
         'sale'
     ],
     'data': [
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'reports/report_margen.xml',
         'views/menuitem_views.xml',
     ],

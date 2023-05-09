@@ -61,6 +61,7 @@
                 <field name="purchase_id" optional="show"/>
                 <field name="invoice_id" optional="show"/>
                 <field name="journal_id" optional="hide"/>
+                <field name="product_id" optional="show"/>
                 <field name="default_code" optional="hide"/>
                 <field name="amount_untaxed" sum="total" widget="monetary"/>
                 <field name="tax_id" optional="hide"/>
