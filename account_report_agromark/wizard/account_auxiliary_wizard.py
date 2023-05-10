@@ -11,6 +11,7 @@ class AccountauxiliaryWizard(models.Model):
 
     account_analityc_ids = fields.Many2many(comodel_name='account.analytic.account',
                                     string='Analytic accounts')
+    account_analityc = fields.Boolean('Cuenta analítica?', default=False)
 
     
     def _get_query_where(self):
@@ -69,11 +70,13 @@ class AccountauxiliaryWizard(models.Model):
             coalesce(rp.name, '**') as partner,
             aml.date as date,
             aj.name as journal,
-            aal.name as analytic,
             am.name as move,
             aml.name as line,
         """
-
+        if self.account_analityc:
+            query += """
+                aal.name as analytic,
+                """
         if self.currency_by:
             query += """
                 rc.name as currency,
@@ -94,7 +97,6 @@ class AccountauxiliaryWizard(models.Model):
         inner join account_account aa on aa.id = aml.account_id
         inner join account_move am on am.id = aml.move_id
         inner join account_journal aj on aj.id = aml.journal_id
-        left join account_analytic_account aal on aal.id = aml.analytic_account_id
         left join res_partner rp on rp.id = aml.partner_id
         """.format(
             credit=self.report_type == 'local' and 'credit' or 'ifrs_credit',
@@ -103,6 +105,10 @@ class AccountauxiliaryWizard(models.Model):
             date_end=self.date_to
         )
 
+        if self.account_analityc:
+            query += """
+                left join account_analytic_account aal on aal.id = aml.analytic_account_id
+                """
         if self.currency_by:
             query += """
             left join res_currency rc on rc.id = aml.currency_id
@@ -179,10 +185,14 @@ class AccountauxiliaryWizard(models.Model):
             ('partner', _('Partner')),
             ('date', _('Date')),
             ('journal', _('Journal')),
-            ('analytic', _('Account Analytic')),
             ('move', _('Move')),
             ('line', _('Line')),
         ]
+
+        if self.account_analityc:
+            report_header += [
+                ('analytic', _('Account Analytic')),
+            ]
 
         if self.currency_by:
             report_header += [
