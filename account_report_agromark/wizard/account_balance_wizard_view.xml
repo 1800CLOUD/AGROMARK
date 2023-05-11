@@ -1,4 +1,4 @@
-<odoo>
+<!--<odoo>
     <record id="account_balance_wizard_view_agromark_inherit" model="ir.ui.view">
         <field name="name">account.balance.wizard.view.agromark.inherit</field>
         <field name="model">account.balance.wizard</field>

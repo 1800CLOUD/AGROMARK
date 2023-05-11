@@ -14,7 +14,7 @@
     'website': "https://1-800cloud.com/",
     'license': 'OPL-1',
     'category': 'Account/Report',
-    'version': '15.0.0.1.9',
+    'version': '15.0.0.2.0',
     'depends': [
         'account_report',
     ],
@@ -23,7 +23,7 @@
         'templates/account_auxiliary_invoices_template.xml',
         'wizard/account_auxiliary_invoices_wizard_view.xml',
         'wizard/account_auxiliary_wizard_view.xml',
-        'wizard/account_balance_wizard_view.xml',
+        #'wizard/account_balance_wizard_view.xml',
         
     ]
 }
