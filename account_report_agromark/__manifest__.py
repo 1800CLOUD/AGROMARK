@@ -23,7 +23,7 @@
         'templates/account_auxiliary_invoices_template.xml',
         'wizard/account_auxiliary_invoices_wizard_view.xml',
         'wizard/account_auxiliary_wizard_view.xml',
-        'wizard/account_balance_wizard_view.xml',
+        #'wizard/account_balance_wizard_view.xml',
         
     ]
 }
