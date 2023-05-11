@@ -35,11 +35,9 @@ class AccountaBalanceWizard(models.Model):
            'credit': sum_line['credit'],
            'balance': sum_line['balance'],
        }
-       if self.balance_analityc:
-           sum_line['analytic_name'] = ''
        return sum_line
-   
-   def update_amounts_line_analytic(self, sum_line):
+
+   def amounts_line_analytics(self, sum_line):
        sum_line = {
            'bold': sum_line['bold'],
            'group': sum_line['group'],
@@ -48,17 +46,32 @@ class AccountaBalanceWizard(models.Model):
            'group_id': '',
            'code': sum_line['code'],
            'name': sum_line['name'],
-           'analytic_name' : '',
+           'analytic_name': '',
            'residual': sum_line['residual'],
            'debit': sum_line['debit'],
            'credit': sum_line['credit'],
            'balance': sum_line['balance'],
        }
-       #if self.partner_by:  
-       #    sum_line['']
        return sum_line
-
    
+   def amounts_line_partner_analytics(self, sum_line):
+       sum_line = {
+           'bold': sum_line['bold'],
+           'group': sum_line['group'],
+           'account_id': sum_line['account_id'],
+           'parent_id': '',
+           'group_id': '',
+           'code': sum_line['code'],
+           'name': sum_line['name'],
+           'analytic_name': '',
+           'vat': '',
+           'partner': '',
+           'residual': sum_line['residual'],
+           'debit': sum_line['debit'],
+           'credit': sum_line['credit'],
+           'balance': sum_line['balance'],
+       }
+       return sum_line
 
    def prepare_data(self):
        query_data = self.prepare_data_query()
@@ -167,9 +180,12 @@ class AccountaBalanceWizard(models.Model):
 
        if self.partner_by or parents:
            sum_line = self.update_amounts_line(sum_line)
-
-       if self.balance_analityc or parents:
-           sum_line  = self.update_amounts_line_analytic(sum_line)  
+        
+       if self.balance_analityc:
+           sum_line = self.amounts_line_analytics(sum_line)
+       
+       if self.balance_analityc and self.partner_by or parents:
+           sum_line = self.amounts_line_partner_analytics(sum_line)
        
        query_data.append(sum_line)
        return {'report_data': query_data and query_data or []}
@@ -198,6 +214,7 @@ class AccountaBalanceWizard(models.Model):
            'credit': credit,
            'balance': balance
        }
+
             
        data_query.append(sum_line)
        return data_query
@@ -234,10 +251,13 @@ class AccountaBalanceWizard(models.Model):
        (coalesce(amlb.debit, 0) - coalesce(amlb.credit, 0)) +
         (coalesce(amla.debit, 0) - coalesce(amla.credit, 0)) as balance
        from (%s) aml
-       left join (%s) amlb ON amlb.account_id = aml.account_id AND
-            (amlb.analytic_id = aml.analytic_id OR (amlb.analytic_id IS null AND aml.analytic_id IS null))
+       left join (%s) amlb ON amlb.account_id = aml.account_id 
        """ % (query_account, query_before)
 
+       if self.balance_analityc:
+           query += """
+           AND (amlb.analytic_id = aml.analytic_id OR (amlb.analytic_id IS null AND aml.analytic_id IS null))
+           """
        if self.partner_by:
            query += """
            AND (amlb.partner_id = aml.partner_id
@@ -245,9 +265,13 @@ class AccountaBalanceWizard(models.Model):
            """
 
        query += """
-       left join (%s) amla ON amla.account_id = aml.account_id AND
-            (amla.analytic_id = aml.analytic_id OR (amla.analytic_id IS null AND aml.analytic_id IS null))
+       left join (%s) amla ON amla.account_id = aml.account_id 
        """ % (query_after)
+
+       if self.balance_analityc:
+           query += """
+           AND (amla.analytic_id = aml.analytic_id OR (amla.analytic_id IS null AND aml.analytic_id IS null))
+           """
 
        if self.partner_by:
            query += """
@@ -272,9 +296,13 @@ class AccountaBalanceWizard(models.Model):
        ids_companies = str(tuple(ids_companies)).replace(',)', ')')
 
        query = """
-       select aa.id as account_id, aa.code, aa.name, aal.id as analytic_id, aal.name as analytic_name
+       select aa.id as account_id, aa.code, aa.name
        """
-       
+       if self.balance_analityc:
+           query += """
+               , aal.id as analytic_id, aal.name as analytic_name
+           """
+
        if self.partner_by:
            query += """
            , aml.partner_id, rp.vat, rp.name as partner
@@ -287,8 +315,8 @@ class AccountaBalanceWizard(models.Model):
        query += """
            inner join account_account aa on aa.id = aml.account_id
            """
-       
-       query += """
+       if self.balance_analityc:
+           query += """
            left join account_analytic_account aal on aal.id = aml.analytic_account_id
            """
 
@@ -336,8 +364,9 @@ class AccountaBalanceWizard(models.Model):
            query += """
            , aml.partner_id, rp.vat, rp.name
            """
-       query += """
-       , aal.id
+       if self.balance_analityc:
+           query += """
+           , aal.id
        """
        query += """
        order by aa.code
@@ -351,8 +380,12 @@ class AccountaBalanceWizard(models.Model):
        ids_companies = str(tuple(ids_companies)).replace(',)', ')')
 
        query = """
-       select aa.id as account_id, aal.id as analytic_id, aal.name as analytic_name,
+       select aa.id as account_id,
        """
+       if self.balance_analityc:
+           query += """
+            aal.id as analytic_id, aal.name as analytic_name,
+            """
 
        if self.partner_by:
            query += """
@@ -377,8 +410,8 @@ class AccountaBalanceWizard(models.Model):
        query += """
            inner join account_account aa on aa.id = aml.account_id
            """
-       
-       query += """
+       if self.balance_analityc:
+           query += """
            left join account_analytic_account aal on aal.id = aml.analytic_account_id
            """
 
@@ -413,10 +446,10 @@ class AccountaBalanceWizard(models.Model):
            query += """
            , aml.partner_id
            """
-
-       query += """
-       , aal.id
-       """
+       if self.balance_analityc:
+           query += """
+           , aal.id
+           """
        
        return query
 
@@ -427,8 +460,12 @@ class AccountaBalanceWizard(models.Model):
        ids_companies = str(tuple(ids_companies)).replace(',)', ')')
 
        query = """
-       select aa.id as account_id, aal.id as analytic_id, aal.name as analytic_name,
+       select aa.id as account_id, 
        """
+       if self.balance_analityc:
+           query += """
+           aal.id as analytic_id, aal.name as analytic_name,
+           """
 
        if self.partner_by:
            query += """
@@ -453,7 +490,8 @@ class AccountaBalanceWizard(models.Model):
        query += """
            inner join account_account aa on aa.id = aml.account_id
            """
-       query += """
+       if self.balance_analityc: 
+           query += """
            left join account_analytic_account aal on aal.id = aml.analytic_account_id
            """
        query += """
@@ -481,8 +519,9 @@ class AccountaBalanceWizard(models.Model):
            query += """
            , aml.partner_id
            """
-       query += """
-       , aal.id
+       if self.balance_analityc:
+           query += """
+           , aal.id
        """
        return query
 
