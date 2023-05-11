@@ -70,13 +70,17 @@ class AccountauxiliaryWizard(models.Model):
             coalesce(rp.name, '**') as partner,
             aml.date as date,
             aj.name as journal,
-            am.name as move,
-            aml.name as line,
         """
         if self.account_analityc:
             query += """
                 aal.name as analytic,
                 """
+           
+        query += """
+            am.name as move,
+            aml.name as line,
+        """
+        
         if self.currency_by:
             query += """
                 rc.name as currency,
@@ -185,14 +189,16 @@ class AccountauxiliaryWizard(models.Model):
             ('partner', _('Partner')),
             ('date', _('Date')),
             ('journal', _('Journal')),
-            ('move', _('Move')),
-            ('line', _('Line')),
         ]
-
         if self.account_analityc:
             report_header += [
                 ('analytic', _('Account Analytic')),
             ]
+
+        report_header += [
+            ('move', _('Move')),
+            ('line', _('Line')),
+        ]
 
         if self.currency_by:
             report_header += [
