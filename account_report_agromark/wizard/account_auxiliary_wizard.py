@@ -218,22 +218,26 @@ class AccountauxiliaryWizard(models.Model):
 
     def prepare_data_acc_rp(self):
         res = super(AccountauxiliaryWizard, self).prepare_data_acc_rp()
-        res = res.replace("'' as journal,", 
+        if self.account_analityc:
+            res = res.replace("'' as journal,", 
                           "'' as journal,\n '' as analytic,")
         return res
 
     def prepare_data_acc(self):
         res = super(AccountauxiliaryWizard, self).prepare_data_acc()
-        res = res.replace("'' as journal,", 
+        if self.account_analityc:
+            res = res.replace("'' as journal,", 
                           "'' as journal,\n '' as analytic,")
         return res
 
     def prepare_data_rp(self):
         res = super(AccountauxiliaryWizard, self).prepare_data_rp()
-        res = res.replace(
+        if self.account_analityc:
+            res = res.replace(
             "'' as journal,",
             "'' as journal,\n '' as analytic,"
-            ).replace(
+            )
+        res = res.replace(
                 "as final",
                 "as final, '' as state"
             )
