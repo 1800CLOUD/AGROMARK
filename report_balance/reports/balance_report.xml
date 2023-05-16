@@ -1,0 +1,9 @@
+<odoo>
+    <record id="report_balance_trial" model="ir.actions.report">
+        <field name="name">Balance</field>
+        <field name="model">balance.account.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">report_balance.balance_report</field>
+        <field name="report_file">report_balance.balance_report</field>
+    </record>
+</odoo>
