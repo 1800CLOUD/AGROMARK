@@ -212,7 +212,7 @@ class ReportPurchase(models.TransientModel):
                 am.invoice_date,
                 am.name,
                 aj.name,
-                aa.name,
+                aa.code,
                 at.tax,
                 at.value,
                 am.move_type,
