@@ -13,6 +13,7 @@ REPORT_TYPE = {
 
 class AccountaBalanceWizard(models.Model):
    _name = 'balance.account.wizard'
+   _description = 'Report balance'
 
    accounts_ids = fields.Many2many(comodel_name='account.account',
                                     string='Cuentas')
