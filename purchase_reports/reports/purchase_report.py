@@ -204,6 +204,8 @@ class ReportPurchase(models.TransientModel):
                 am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}'
                 {wh}
             GROUP BY 
+                am.invoice_date,
+                am.name,
                 pt.name,
                 pt.default_code,
                 rp.vat,
@@ -231,6 +233,7 @@ class ReportPurchase(models.TransientModel):
         titles = ['NIT', 
                   'PROVEEDOR', 
                   'ORDEN DE COMPRA', 
+                  'FECHA FACTURA',
                   'FACTURA',
                   'DIARIO',
                   'REFERENCIA INTERNA',
@@ -251,6 +254,7 @@ class ReportPurchase(models.TransientModel):
         titles_format.set_bold()
         worksheet.set_column("A:G", 22)
         worksheet.set_row(0, 25)
+        money_format = workbook.add_format({'num_format': '$#,##0.00'})
         
         col_num = 0
         for title in titles:
@@ -260,11 +264,16 @@ class ReportPurchase(models.TransientModel):
         for index, data in enumerate(result):
             row = index + 1
             col_num = 0
-            for d in data:
+            for i, d in enumerate(data):
+                if i in [9,11, 12]:
+                    worksheet.write(row, col_num, d, money_format)
+                else:
+                    worksheet.write(row, col_num, d)
                 if isinstance(d, datetime.date):
                     d = d.strftime("%Y-%m-%d")
-                worksheet.write(row, col_num, d)
+                    worksheet.write(row, col_num, d)
                 col_num += 1
+            
         
         workbook.close()
         xlsx_data = output.getvalue()
