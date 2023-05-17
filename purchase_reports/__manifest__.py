@@ -11,7 +11,7 @@
     'website': 'http://www.1-800cloud.com',
     'category': 'Purchase/Purchase',
     'license': 'LGPL-3',
-    'version': '15.0.0.0.4',
+    'version': '15.0.0.0.5',
     'depends': [
         'base_setup',
         'purchase',
