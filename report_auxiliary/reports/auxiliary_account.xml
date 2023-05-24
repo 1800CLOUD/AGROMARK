@@ -1,0 +1,9 @@
+<odoo>
+    <record id="report_auxiliary_agr" model="ir.actions.report">
+        <field name="name">Auxliar</field>
+        <field name="model">report.auxiliary.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">report_auxiliary.account_auxiliary</field>
+        <field name="report_file">report_auxiliary.account_auxiliary</field>
+    </record>
+</odoo>

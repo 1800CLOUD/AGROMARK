@@ -59,7 +59,9 @@
                 <field name="invoice_date" optional="show"/>
                 <field name="partner_id" optional="show"/>
                 <field name="purchase_id" optional="show"/>
+                <field name="account_inventory" optional="hide"/>
                 <field name="invoice_id" optional="show"/>
+
                 <field name="journal_id" optional="hide"/>
                 <field name="product_id" optional="show"/>
                 <field name="default_code" optional="hide"/>
