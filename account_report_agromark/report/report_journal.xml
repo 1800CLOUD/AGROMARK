@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_journal_inherit" inherit_id="account.report_journal">
+        <xpath expr="//table[@id='move_table']" position="replace">
+            <table class="table table-sm table-striped mt-4" id="move_table">
+                <thead>
+                    <tr>
+                        <th t-if="data['form'].get('sort_selection') == 'move_name'">Asiento</th>
+                        <th t-if="data['form'].get('sort_selection') == 'move_name'">Fecha</th>
+                        <th t-if="data['form'].get('sort_selection') == 'date'">Fecha</th>
+                        <th t-if="data['form'].get('sort_selection') == 'date'">Asiento</th>
+                        <!-- Set a minimum width for columns, otherwise the line breaks too early -->
+                        <th style="min-width: 150px">Asociado</th>
+                        <th style="min-width: 250px">Cuenta</th>
+                        <th style="min-width: 350px">Etiqueta</th>
+                        <th t-if="data['form']['amount_currency']" style="text-align: right;">Moneda</th>
+                        <th style="text-align: right;">Debito</th>
+                        <th style="text-align: right;">Credito</th>
+                        <th style="text-align: right;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="last_am" t-value=""/>
+                    <t t-set="last_date" t-value=""/>
+                    <t t-set="last_partner" t-value=""/>
+                    <tr t-foreach="lines[o.id]" t-as="aml">
+                        <t t-if="data['form'].get('sort_selection') == 'move_name'">
+                            <t t-set="am_name" t-value="aml.move_id.name != '/' and aml.move_id.name or ('*'+str(aml.move_id.id))"/>
+                            <t t-if="last_am == am_name">
+                                <td/>
+                            </t>
+                            <t t-else="">
+                                <td><span t-esc="am_name" class="font-weight-bold"/></td>
+                                <t t-set="last_am" t-value="am_name"/>
+                                <!-- Reset these when changing move -->
+                                <t t-set="last_date" t-value=""/>
+                                <t t-set="last_partner" t-value=""/>
+                            </t>
+                            <t t-if="last_date == aml.date">
+                                <td/>
+                            </t>
+                            <t t-else="">
+                                <td><span t-field="aml.date"/></td>
+                                <t t-set="last_date" t-value="aml.date"/>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <t t-set="am_name" t-value="aml.move_id.name != '/' and aml.move_id.name or ('*'+str(aml.move_id.id))"/>
+                            <t t-if="last_date == aml.date and last_am == am_name">
+                                <td/>
+                            </t>
+                            <t t-else="">
+                                <td><span t-field="aml.date" class="font-weight-bold"/></td>
+                                <t t-set="last_date" t-value="aml.date"/>
+                                <!-- Reset these when changing data -->
+                                <t t-set="last_am" t-value=""/>
+                                <t t-set="last_partner" t-value=""/>
+                            </t>
+                            <t t-if="last_am == am_name">
+                                <td/>
+                            </t>
+                            <t t-else="">
+                                <td><span t-esc="am_name"/></td>
+                                <t t-set="last_am" t-value="am_name"/>
+                                <t t-set="last_partner" t-value=""/>
+                            </t>
+                        </t>
+                        <t t-set="partner_name" t-value="aml.sudo().partner_id and aml.sudo().partner_id.name and aml.sudo().partner_id.name or ''"/>
+                        <!-- general journals always show partners, as we can have multiple != ones in a single move -->
+                        <t t-if="last_partner == partner_name and o.type != 'general'">
+                            <td/>
+                        </t>
+                        <t t-else="">
+                            <td><span t-esc="partner_name"/></td>
+                            <t t-set="last_partner" t-value="partner_name"/>
+                        </t>
+                        <td><span t-field="aml.account_id.code"/> <span t-field="aml.account_id.name"/></td>
+                        <td><span t-esc="aml.name"/></td>
+                        <td t-if="data['form']['amount_currency'] and aml.amount_currency" class="pull-right">
+                            <span class="text-monospace"
+                                  t-esc="aml.amount_currency"
+                                  t-options="{'widget': 'monetary', 'display_currency': aml.currency_id}"/>
+                        </td>
+                        <td style="text-align: right;">
+                            <span t-if="not (company_id or res_company).currency_id.is_zero(aml.debit)"
+                                  t-esc="aml.debit"
+                                  t-options="{
+                                      'widget': 'monetary',
+                                      'display_currency': (company_id or res_company).currency_id
+                                  }"
+                                  class="text-monospace"/>
+                        </td>
+                        <td style="text-align: right;">
+                            <span t-if="not (company_id or res_company).currency_id.is_zero(aml.credit)"
+                                  t-esc="aml.credit"
+                                  t-options="{
+                                      'widget': 'monetary',
+                                      'display_currency': (company_id or res_company).currency_id
+                                  }"
+                                  class="text-monospace"/>
+                        </td>
+                        <td>
+                            <t t-if="aml.move_id.state == 'posted'">
+                              Publicado
+                            </t>
+                            <t t-elif="aml.move_id.state == 'draft'">
+                              Borrador
+                            </t>
+                            <t t-elif="aml.move_id.state == 'cancel'">
+                              Cancelado
+                            </t>
+                        </td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td/>
+                        <td/>
+                        <td/>
+                        <td/>
+                        <td class="text-right"><strong>Total</strong></td>
+                        <td style="text-align: right;">
+                            <span t-esc="sum_debit(data, o)"
+                                  t-options="{
+                                    'widget': 'monetary',
+                                    'display_currency': (company_id or res_company).currency_id
+                                  }"
+                                  class="font-weight-bold text-monospace"/>
+                        </td>
+                        <td style="text-align: right;">
+                            <span t-esc="sum_credit(data, o)"
+                                  t-options="{
+                                      'widget': 'monetary',
+                                      'display_currency': (company_id or res_company).currency_id
+                                  }"
+                                  class="font-weight-bold text-monospace"/>
+                        </td>
+                        <td t-if="data['form']['amount_currency']"/>
+                    </tr>
+                </tbody>
+            </table>
+        </xpath>
+    </template>
+</odoo>

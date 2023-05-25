@@ -1,0 +1,61 @@
+<odoo>
+    <record model="ir.ui.view" id="view_account_auxiliary_form">
+        <field name="name">view.account.auxiliary.form</field>
+        <field name="model">report.auxiliary.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Auxiliar">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="report_type" />
+                            <label for="date_from" string="Date" />
+                            <div class="o_row">
+                                <div class="o_row">
+                                    <field name="date_from" required="True" />
+                                </div>
+                                <field name="date_to" required="True" />
+                            </div>
+                             <field name ="group_by_partner" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="line_state" />
+                            <field name="currency_by" groups="base.group_multi_currency" />
+                            <field name="no_zero"/>
+                            <field name="account_by"/>
+                            <field name="partner_by" />
+                            <field name="group_by" invisible="0"/>
+                            <field name="account_analityc"/>
+                        </group>
+                    </group>
+                    <group string="Filters">
+                        <group string="Cuentas">
+                            <field name="accounts_ids" widget="many2many_tags" />
+                            <field name="account_analityc_ids" widget="many2many_tags" 
+                                attrs="{'invisible': [('account_analityc','=',False)]}"/>
+                        </group>
+                        <group string="Terceros">
+                            <field name="partners_ids" widget="many2many_tags" />
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Ver" class="btn-primary" name="preview_html" type="object"/>
+                    o
+                    <button string="Confirmar" class="btn-primary" name="action_confirm" type="object" />
+                    o
+                    <button string="Cancelar" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_report_auxiliary" model="ir.actions.act_window">
+        <field name="name">Auxiliar</field>
+        <field name="res_model">report.auxiliary.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_report_auxiliary" parent="report_margen_product.menu_partner_report_account" sequence="30" 
+        name="Reporte Auxiliar" action="action_report_auxiliary" />
+</odoo>
