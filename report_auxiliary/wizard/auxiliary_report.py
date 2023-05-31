@@ -446,7 +446,7 @@ class AccountauxiliaryWizard(models.Model):
         #     """ % pids
 
         query += """
-        group by aml.partner_id, rp.vat, aa.code
+        group by aml.partner_id, rp.name, rp.vat, aa.code, aa.id
         order by rp.name
         """
         return query
@@ -523,7 +523,7 @@ class AccountauxiliaryWizard(models.Model):
         )
 
         query += """
-        group by rp.vat, rp.name
+        group by aa.id, rp.vat, rp.name
         order by rp.vat
         """
         return query

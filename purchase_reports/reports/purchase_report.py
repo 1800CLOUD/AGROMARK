@@ -12,7 +12,7 @@ import io
 
 class ReportPurchase(models.TransientModel):
     _name = 'report.purchase'
-    _description = 'Reporte Disponibilidad Stock'
+    _description = 'Reporte de compras'
     
     name = fields.Char('Nombre', readonly=True, default='Reporte de compras')
     partner_ids = fields.Many2many('res.partner', string='Proveedores', copy=False)

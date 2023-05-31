@@ -152,6 +152,10 @@ class ReportInvoice(models.TransientModel):
                             aa.name,
                             pt.default_code,
                             pt.name,
+                            CASE 
+                                WHEN pt.detailed_type = 'product' THEN 'Almacenable'
+                                ELSE 'Servicio'
+                            END,
                             pc.name,
                             pb.name,
                             uu.name,
@@ -213,6 +217,7 @@ class ReportInvoice(models.TransientModel):
                         am.move_type,
                         aml.quantity,
                         aml.balance,
+                        pt.detailed_type,
                         aml.id
                         
                     
@@ -230,6 +235,7 @@ class ReportInvoice(models.TransientModel):
                 'Cuenta analítica', 
                 'Referencia Interna',
                 'Producto',
+                'Tipo de Producto',
                 'Categoria',
                 'Marca',
                 'Unidad de medida', 

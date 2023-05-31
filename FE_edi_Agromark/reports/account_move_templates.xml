@@ -3,7 +3,7 @@
 
     <template id="report_account_move_einvoicing_document" inherit_id="l10n_co_bloodo.report_account_move_einvoicing_document">
 
-        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="before">
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_priceunit']" position="after">
             <th width="8%" name="th_taxes" class="text-center"><span>IMPUESTOS</span></th>
         </xpath>
         <xpath expr="//table[@name='invoice_line_table']//td[5]" position="after">
