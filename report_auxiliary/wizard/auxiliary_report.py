@@ -149,6 +149,10 @@ class AccountauxiliaryWizard(models.Model):
         if self.group_by:
             data_acc_rp = self._execute_query(query_data_acc_rp)
             query_data += data_acc_rp
+            query_data = sorted(
+                query_data,
+                key=lambda r: [r['code'], r['partner'], not r['bold']]
+            )
         if self.account_by:
             data_acc = self._execute_query(query_data_acc)
             query_data += data_acc
@@ -446,7 +450,7 @@ class AccountauxiliaryWizard(models.Model):
         #     """ % pids
 
         query += """
-        group by aml.partner_id, rp.vat, aa.code
+        group by aml.partner_id, rp.name, rp.vat, aa.code, aa.id
         order by rp.name
         """
         return query
@@ -523,7 +527,7 @@ class AccountauxiliaryWizard(models.Model):
         )
 
         query += """
-        group by rp.vat, rp.name
+        group by aa.id, rp.vat, rp.name
         order by rp.vat
         """
         return query
