@@ -14,6 +14,35 @@ class AccountauxiliaryWizard(models.Model):
     account_analityc = fields.Boolean('Cuenta analítica?', default=False)
 
     
+    def prepare_data2(self):
+        query_data_detail = self.prepare_data_detail()
+        query_data_acc_rp = self.prepare_data_acc_rp()
+        query_data_acc = self.prepare_data_acc()
+        query_data_rp = self.prepare_data_rp()
+
+        data_detail = self._execute_query(query_data_detail)
+        query_data = data_detail
+        if self.group_by:
+            data_acc_rp = self._execute_query(query_data_acc_rp)
+            query_data += data_acc_rp
+        if self.account_by:
+            data_acc = self._execute_query(query_data_acc)
+            query_data += data_acc
+        if self.partner_by:
+            data_rp = self._execute_query(query_data_rp)
+            query_data += data_rp
+            query_data = sorted(
+                query_data,
+                key=lambda r: [r['partner'], not r['bold']]
+            )
+        else:
+            query_data = sorted(
+                query_data,
+                key=lambda r: [r['date'], r['move'], r['partner'], not r['bold']]
+            )
+
+        return {'report_data': query_data and query_data or []}
+
     def _get_query_where(self):
         ids_companies = self.env.companies.ids
         ids_companies = str(tuple(ids_companies)).replace(',)', ')')

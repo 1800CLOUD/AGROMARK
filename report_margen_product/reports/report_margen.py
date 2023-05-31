@@ -47,7 +47,7 @@ class ReportInvoice(models.TransientModel):
             
         qry = f'''
                 INSERT INTO margen_report_line (product_id, default_code, product_brand_id, quantity, price_subtotal, cost, utility, 
-                                                percentage_uti, percentage_renta, create_date, write_date)
+                                                percentage_uti, percentage_renta, product_type, create_date, write_date)
 
                 SELECT
                     aml.product_id, 
@@ -55,12 +55,13 @@ class ReportInvoice(models.TransientModel):
                     pt.product_brand_id,
                     SUM(aml.quantity * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) AS num_qty,
                     SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) AS subtotal,
-                    svl.cost_in - svl.cost_off  AS cost_product,
-                    (SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_in - svl.cost_off)) AS difference,
-                    ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_in - svl.cost_off)) / 
+                    svl.cost_off  AS cost_product,
+                    (SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_off)) AS difference,
+                    ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_off)) / 
                     NULLIF(SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)),0)) AS utility,
-                    ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_in - svl.cost_off)) / 
-                    NULLIF((svl.cost_in - svl.cost_off),0)) AS renta,
+                    ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_off)) / 
+                    NULLIF((svl.cost_off),0)) AS renta,
+                    pt.detailed_type,
                     '{dt_now}', 
                     '{dt_now}'
 
@@ -72,29 +73,20 @@ class ReportInvoice(models.TransientModel):
                     LEFT JOIN product_brand pb ON pt.product_brand_id = pb.id
                     LEFT JOIN LATERAL (
                                 SELECT 
-                                    CASE 
-                                        WHEN svl.value >= 0 THEN SUM(svl.value * (-1))
-                                        ELSE 0
-                                    END AS cost_off,
-                                    CASE 
-                                        WHEN svl.value < 0 THEN SUM(ABS(svl.value)) 
-                                        ELSE 0
-                                    END AS cost_in
-
+                                    SUM(svl.value) AS cost_off
                                 FROM 
                                     stock_valuation_layer svl
                                 WHERE 
                                     svl.product_id = pp.id AND
                                     DATE(svl.create_date) BETWEEN  '{dt_from}' AND '{dt_to}' 
-                                GROUP BY
-                                svl.value
+
 
                                 LIMIT 1
-                    ) svl ON true
+                            ) svl ON true
 
                     WHERE
                         am.move_type IN ('out_invoice', 'out_refund') AND
-                        pt.detailed_type = 'product' AND 
+                        pt.detailed_type IN ('product','service') AND
                         am.state = 'posted' AND
                         am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}' 
                         {wh}
@@ -102,8 +94,8 @@ class ReportInvoice(models.TransientModel):
                         aml.product_id,
                         pt.default_code,
                         pt.product_brand_id,
-                        svl.cost_in,
-                        svl.cost_off
+                        svl.cost_off,
+                        pt.detailed_type
                         
                    '''     
         cr.execute(qry)
@@ -137,15 +129,19 @@ class ReportInvoice(models.TransientModel):
         cr.execute(f'''SELECT
                             pt.name, 
                             pt.default_code,
+                            CASE 
+                                WHEN pt.detailed_type = 'product' THEN 'Almacenable'
+                                ELSE 'Servicio'
+                            END,
                             pb.name,
                             SUM(aml.quantity * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) AS num_qty,
                             SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) AS subtotal,
-                            svl.cost_in - svl.cost_off  AS cost_product,
-                            (SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_in - svl.cost_off)) AS difference,
-                            ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_in - svl.cost_off)) / 
+                            svl.cost_off  AS cost_product,
+                            (SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_off)) AS difference,
+                            ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_off)) / 
                             NULLIF(SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)),0)) AS utility,
-                            ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_in - svl.cost_off)) / 
-                            NULLIF((svl.cost_in - svl.cost_off),0)) AS renta
+                            ((SUM(aml.price_subtotal * (CASE WHEN am.move_type = 'out_invoice' THEN 1 ELSE -1 END)) - (svl.cost_off)) / 
+                            NULLIF((svl.cost_off),0)) AS renta
                             
 
                         FROM account_move_line aml
@@ -155,22 +151,13 @@ class ReportInvoice(models.TransientModel):
                             LEFT JOIN product_brand pb ON pt.product_brand_id = pb.id
                             LEFT JOIN LATERAL (
                                 SELECT 
-                                    CASE 
-                                        WHEN svl.value >= 0 THEN SUM(svl.value) * (-1)
-                                        ELSE 0
-                                    END AS cost_off,
-                                    CASE 
-                                        WHEN svl.value < 0 THEN SUM(ABS(svl.value)) 
-                                        ELSE 0
-                                    END AS cost_in
-
+                                    SUM(svl.value) AS cost_off
                                 FROM 
                                     stock_valuation_layer svl
                                 WHERE 
                                     svl.product_id = pp.id AND
                                     DATE(svl.create_date) BETWEEN  '{dt_from}' AND '{dt_to}' 
-                                GROUP BY
-                                    svl.value
+
 
                                 LIMIT 1
                             ) svl ON true
@@ -178,7 +165,7 @@ class ReportInvoice(models.TransientModel):
 
                         WHERE
                             am.move_type IN ('out_invoice', 'out_refund') AND
-                            pt.detailed_type = 'product' AND 
+                            pt.detailed_type IN ('product','service') AND
                             am.state = 'posted' AND
                             am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}' 
                             {wh}
@@ -186,8 +173,8 @@ class ReportInvoice(models.TransientModel):
                         pt.name,
                         pt.default_code,
                         pb.name,
-                        svl.cost_in,
-                        svl.cost_off                  
+                        svl.cost_off,
+                        pt.detailed_type                  
                         
                         
                       ''')
@@ -200,6 +187,7 @@ class ReportInvoice(models.TransientModel):
         titles = [
                 'Producto', 
                 'Referencia Interna',
+                'Tipo de Producto',
                 'Marca',
                 'Cantidad',
                 'Ingreso', 
@@ -229,7 +217,7 @@ class ReportInvoice(models.TransientModel):
             row = index + 1
             col_num = 0
             for i, d in enumerate(data):
-                if i in [4,5, 6]:
+                if i in [5,6, 7]:
                     worksheet.write(row, col_num, d, money_format)
                 else:
                     worksheet.write(row, col_num, d)
@@ -257,5 +245,11 @@ class InvoiceReportLine(models.TransientModel):
     price_subtotal = fields.Float(string='V. antes Impuesto', readonly=True)
     default_code = fields.Char('Referencia interna', readonly=True)
     product_brand_id = fields.Many2one('product.brand', string="Marca", readonly=True)
+    product_type = fields.Selection([
+        ('product', 'Almacenable'),
+        ('service', 'Servicio'),
+        ('consu', 'Consumible'),
+        ], string='Tipo de producto', readonly=True)
+    
     
     
