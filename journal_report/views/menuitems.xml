@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <menuitem id="menu_audit_journal"
+            name="Informe de Auditoria de Diario"
+            action="action_audit_journal"
+            parent="report_margen_product.menu_partner_report_account"
+            sequence="35"
+        />
+
+    </data>
+</odoo>
