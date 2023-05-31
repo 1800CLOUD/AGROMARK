@@ -73,12 +73,16 @@ class ReportInvoice(models.TransientModel):
                     LEFT JOIN product_brand pb ON pt.product_brand_id = pb.id
                     LEFT JOIN LATERAL (
                                 SELECT 
-                                    SUM(svl.value) AS cost_off
+                                    SUM(aml2.debit) AS cost_off
                                 FROM 
                                     stock_valuation_layer svl
+                                LEFT JOIN account_move am2 ON svl.account_move_id = am2.id 
+                                LEFT JOIN account_move_line aml2 ON am2.id = aml2.move_id
+                                LEFT JOIN account_account aa2 ON aml2.account_id = aa2.id 
                                 WHERE 
-                                    svl.product_id = pp.id AND
-                                    DATE(svl.create_date) BETWEEN  '{dt_from}' AND '{dt_to}' 
+                                    aml2.product_id = pp.id AND
+                                    aa2.code LIKE '6135%' AND
+                                    am.date BETWEEN  '{dt_from}' AND '{dt_to}' 
 
 
                                 LIMIT 1
@@ -86,7 +90,7 @@ class ReportInvoice(models.TransientModel):
 
                     WHERE
                         am.move_type IN ('out_invoice', 'out_refund') AND
-                        pt.detailed_type IN ('product','service') AND
+                        pt.detailed_type = 'product' AND
                         am.state = 'posted' AND
                         am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}' 
                         {wh}
@@ -151,21 +155,26 @@ class ReportInvoice(models.TransientModel):
                             LEFT JOIN product_brand pb ON pt.product_brand_id = pb.id
                             LEFT JOIN LATERAL (
                                 SELECT 
-                                    SUM(svl.value) AS cost_off
+                                    SUM(aml2.debit) AS cost_off
                                 FROM 
                                     stock_valuation_layer svl
+                                LEFT JOIN account_move am2 ON svl.account_move_id = am2.id 
+                                LEFT JOIN account_move_line aml2 ON am2.id = aml2.move_id
+                                LEFT JOIN account_account aa2 ON aml2.account_id = aa2.id 
                                 WHERE 
-                                    svl.product_id = pp.id AND
-                                    DATE(svl.create_date) BETWEEN  '{dt_from}' AND '{dt_to}' 
+                                    aml2.product_id = pp.id AND
+                                    aa2.code LIKE '6135%' AND
+                                    am.date BETWEEN  '{dt_from}' AND '{dt_to}' 
 
 
                                 LIMIT 1
                             ) svl ON true
 
 
+
                         WHERE
                             am.move_type IN ('out_invoice', 'out_refund') AND
-                            pt.detailed_type IN ('product','service') AND
+                            pt.detailed_type IN ('product', 'service') AND
                             am.state = 'posted' AND
                             am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}' 
                             {wh}

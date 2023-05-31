@@ -149,6 +149,10 @@ class AccountauxiliaryWizard(models.Model):
         if self.group_by:
             data_acc_rp = self._execute_query(query_data_acc_rp)
             query_data += data_acc_rp
+            query_data = sorted(
+                query_data,
+                key=lambda r: [r['code'], r['partner'], not r['bold']]
+            )
         if self.account_by:
             data_acc = self._execute_query(query_data_acc)
             query_data += data_acc
