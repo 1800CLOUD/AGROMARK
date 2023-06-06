@@ -123,9 +123,7 @@ class ReportInvoice(models.TransientModel):
         view_id = self.env['ir.ui.view'].search([('name','=','report_invoice.view_account_invoice_report_line_pivot')])
         dt_from = str(self.date_from)
         dt_to = str(self.date_to)
-        domain = [('invoice_date', '>', dt_from), ('invoice_date', '<=', dt_to)]
         return {
-                'domain': domain,
                 'name': 'Análisis de Facturados',
                 'view_type': 'form',
                 'view_mode': 'pivot',
