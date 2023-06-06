@@ -213,7 +213,7 @@ class ReportInvoice(models.TransientModel):
             row = index + 1
             col_num = 0
             for i, d in enumerate(data):
-                if i in [5,6, 7]:
+                if i in [4,5, 6]:
                     worksheet.write(row, col_num, d, money_format)
                 else:
                     worksheet.write(row, col_num, d)
