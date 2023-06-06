@@ -22,6 +22,10 @@ class AccountauxiliaryWizard(models.Model):
 
         data_detail = self._execute_query(query_data_detail)
         query_data = data_detail
+        query_data = sorted(
+            query_data,
+            key=lambda r: [r['date'], r['move'], r['partner'], not r['bold']]
+        )
         if self.group_by:
             data_acc_rp = self._execute_query(query_data_acc_rp)
             query_data += data_acc_rp
@@ -38,7 +42,7 @@ class AccountauxiliaryWizard(models.Model):
         else:
             query_data = sorted(
                 query_data,
-                key=lambda r: [r['date'], r['move'], r['partner'], not r['bold']]
+                key=lambda r: [r['code'], r['move'], r['partner'], not r['bold']]
             )
 
         return {'report_data': query_data and query_data or []}
