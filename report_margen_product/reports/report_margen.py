@@ -29,7 +29,6 @@ class ReportInvoice(models.TransientModel):
             return f" AND {table}.{fld} IN ({','.join(str(x.id) for x in vl)})"
         
         cr = self._cr
-        wh = ''
         uid = self.env.user.id
         dt_now = fields.Datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         dt_from = str(self.date_from)
@@ -40,7 +39,7 @@ class ReportInvoice(models.TransientModel):
         if self.brand_ids:
             wh += _add_where('pt', 'product_brand_id', self.brand_ids)
 
-            
+
         #add_fields_insert, add_fields_select, add_fields_from = self.extended_compute_fields()
             
         cr.execute(f'DELETE FROM margen_report_line')
@@ -48,7 +47,6 @@ class ReportInvoice(models.TransientModel):
         qry = f'''
                 INSERT INTO margen_report_line (product_id, default_code, product_brand_id, quantity, price_subtotal, cost, utility, 
                                                 percentage_uti, percentage_renta, create_date, write_date)
-
                 SELECT
                     aml.product_id, 
                     pt.default_code,
@@ -81,12 +79,12 @@ class ReportInvoice(models.TransientModel):
                                 WHERE 
                                     aml2.product_id = pp.id AND
                                     aa2.code LIKE '6135%' AND
-                                    am.date BETWEEN  '{dt_from}' AND '{dt_to}' 
-
-
+                                    aml2.date BETWEEN  '{dt_from}' AND '{dt_to}' 
+                                
+                                
                                 LIMIT 1
+                                
                             ) svl ON true
-
                     WHERE
                         am.move_type IN ('out_invoice', 'out_refund') AND
                         pt.detailed_type = 'product' AND
@@ -98,7 +96,6 @@ class ReportInvoice(models.TransientModel):
                         pt.default_code,
                         pt.product_brand_id,
                         svl.cost_off
-                        
                    '''     
         cr.execute(qry)
 
@@ -158,7 +155,7 @@ class ReportInvoice(models.TransientModel):
                                 WHERE 
                                     aml2.product_id = pp.id AND
                                     aa2.code LIKE '6135%' AND
-                                    am.date BETWEEN  '{dt_from}' AND '{dt_to}' 
+                                    aml2.date BETWEEN  '{dt_from}' AND '{dt_to}' 
 
 
                                 LIMIT 1
