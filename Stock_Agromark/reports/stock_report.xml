@@ -28,8 +28,7 @@
             <form string="Informe Disponibilidad">
                 <sheet>
                     <div class="oe_button_box">                        
-                        <button name="button_bi" type="object" class="oe_stat_button" icon="fa-sort-amount-asc" 
-                                string="Analizar" context="{'pivot': True}"/>
+                        <button name="analysis" type="object" class="oe_stat_button" icon="fa-sort-amount-asc" string="Analisis"/>
                         <button name="get_xlsx_report" type="object" class="oe_stat_button" icon="fa-file-excel-o" string="Excel"/>
                     </div>
                     <h1>

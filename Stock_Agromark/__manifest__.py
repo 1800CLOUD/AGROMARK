@@ -11,7 +11,7 @@
     'website': 'http://www.1-800cloud.com',
     'category': 'Inventory/Inventory',
     'license': 'LGPL-3',
-    'version': '15.0.0.0.0',
+    'version': '15.0.0.0.1',
     'depends': [
         'stock',
         'sale',
