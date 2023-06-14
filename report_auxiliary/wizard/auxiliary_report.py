@@ -4,6 +4,7 @@ import logging
 
 from odoo import _, fields, models, api
 from odoo.exceptions import ValidationError
+from datetime import date
 
 REPORT_TYPE = {
     'local': 'Local',
@@ -143,38 +144,46 @@ class AccountauxiliaryWizard(models.Model):
         query_data_acc_rp = self.prepare_data_acc_rp()
         query_data_acc = self.prepare_data_acc()
         query_data_rp = self.prepare_data_rp()
-
+    
         data_detail = self._execute_query(query_data_detail)
         query_data = data_detail
+        query_data = sorted(
+            query_data,
+            key=lambda r: [r['code'], r['partner'], not r['bold']]
+        )
         if self.group_by:
             data_acc_rp = self._execute_query(query_data_acc_rp)
             query_data += data_acc_rp
-            query_data = sorted(
-                query_data,
-                key=lambda r: [r['code'], r['partner'], not r['bold']]
-            )
         if self.account_by:
             data_acc = self._execute_query(query_data_acc)
             query_data += data_acc
+        if self.partner_by:
+            data_rp = self._execute_query(query_data_rp)
+            query_data += data_rp
+    
+        if self.partner_by:
+            query_data = sorted(
+                query_data,
+                key=lambda r: [r['code'], r['move'], r['partner'], not r['bold']]
+            )
+        elif self.account_by:
             query_data = sorted(
                 query_data,
                 key=lambda r: [r['code'], not r['bold']]
             )
-        if self.partner_by:
-            data_rp = self._execute_query(query_data_rp)
-            query_data += data_rp
+        elif self.group_by:
             query_data = sorted(
                 query_data,
-                key=lambda r: [r['partner'], not r['bold']]
+                key=lambda r: [r['partner'], r['code'], not r['bold']]
             )
         else:
             query_data = sorted(
                 query_data,
-                key=lambda r: [r['date'], r['move'], r['partner'], not r['bold']]
+                key=lambda r: [date.today() if r['date'] == '' else r['date'], r['move'], r['partner'], not r['bold']]
             )
-
+    
         return {'report_data': query_data and query_data or []}
-
+    
     def _execute_query(self, query):
         self.env.cr.execute(query)
         data_query = self.env.cr.dictfetchall()
@@ -354,6 +363,7 @@ class AccountauxiliaryWizard(models.Model):
         return query
     
     def prepare_data_acc_rp(self):
+
         query = """
         select
             True as bold,
@@ -435,24 +445,11 @@ class AccountauxiliaryWizard(models.Model):
             where2=self._get_query_where2()
         )
 
-        # if self.accounts_ids:
-        #     accounts_ids=self.accounts_ids.ids
-        #     aids=str(tuple(accounts_ids)).replace(',)', ')')
-        #     query += """
-        #     and aml.account_id in %s
-        #     """ % aids
-
-        # if self.partners_ids:
-        #     partners_ids=self.partners_ids.ids
-        #     pids=str(tuple(partners_ids)).replace(',)', ')')
-        #     query += """
-        #     and aml.partner_id in %s
-        #     """ % pids
-
-        query += """
-        group by aml.partner_id, rp.name, rp.vat, aa.code, aa.id
-        order by rp.name
+        query += f"""
+        group by aa.code, aa.id, aml.partner_id, rp.vat, rp.name, aml.move_id
+        order by aa.code, aml.partner_id
         """
+        
         return query
     
     def prepare_data_rp(self):
@@ -594,20 +591,6 @@ class AccountauxiliaryWizard(models.Model):
             where=self._get_query_where(),
             where2=self._get_query_where2()
         )
-
-        # if self.accounts_ids:
-        #     accounts_ids=self.accounts_ids.ids
-        #     aids=str(tuple(accounts_ids)).replace(',)', ')')
-        #     query += """
-        #     and aml.account_id in %s
-        #     """ % aids
-
-        # if self.partners_ids:
-        #     partners_ids=self.partners_ids.ids
-        #     pids=str(tuple(partners_ids)).replace(',)', ')')
-        #     query += """
-        #     and aml.partner_id in %s
-        #     """ % pids
 
         query += """
         group by aa.code, aa.id

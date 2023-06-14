@@ -52,16 +52,24 @@ class ReportStockQuant(models.TransientModel):
             
         #add_fields_insert, add_fields_select, add_fields_from = self.extended_compute_fields()
             
-        cr.execute(f'DELETE FROM report_stock_quant_line WHERE create_uid = {uid}')
+        cr.execute(f'DELETE FROM report_stock_quant_line')
             
         qry = f'''
             INSERT INTO report_stock_quant_line (product_id, product_brand_id, location_id, lot_id,
                 quantity, reserved_quantity, available_qty, categ_id,
                 create_date, write_date, product_uom_id)
-                SELECT
-                    sq.product_id, pt.product_brand_id, sq.location_id, sq.lot_id, sq.quantity, sq.reserved_quantity,
-                    (sq.quantity - sq.reserved_quantity), pt.categ_id, 
-                    '{dt_now}', '{dt_now}', pt.uom_id
+                SELECT 
+                    DISTINCT sq.product_id, 
+                    pt.product_brand_id, 
+                    sq.location_id, 
+                    sq.lot_id, 
+                    sq.quantity, 
+                    sq.reserved_quantity,
+                    (sq.quantity - sq.reserved_quantity), 
+                    pt.categ_id, 
+                    to_timestamp('{dt_now}', 'YYYY-MM-DD HH24:MI:SS'), 
+                    to_timestamp('{dt_now}', 'YYYY-MM-DD HH24:MI:SS'),
+                    pt.uom_id
                 FROM
                     stock_quant sq
                     INNER JOIN product_product pp ON sq.product_id = pp.id
@@ -69,11 +77,24 @@ class ReportStockQuant(models.TransientModel):
                     INNER JOIN stock_location sl ON sq.location_id = sl.id
                 WHERE
                     sl.usage = 'internal' AND 
-                    sq.quantity > 0.0 
+                    sq.quantity > 0.0 AND
+                    pt.detailed_type = 'product'
                     {wh}
+                
         '''
         cr.execute(qry)
-        
+    
+    def analysis(self):
+        self.compute_report()
+        view_id = self.env['ir.ui.view'].search([('name','=','Stock_Agromark.report_stock_quant_line_pivot')])
+        return {
+                'name': 'Disponibilidad de Stock',
+                'view_type': 'form',
+                'view_mode': 'pivot',
+                'view_id': view_id.id, 
+                'res_model': 'report.stock.quant.line',
+                'type': 'ir.actions.act_window'
+            }
     
     def _button_excel(self):
         def _add_where(table, fld, vl):
@@ -93,21 +114,31 @@ class ReportStockQuant(models.TransientModel):
         if self.categ_ids:
             wh += _add_where('pt', 'categ_id', self.categ_ids)
         
-        excel_qry = f'''            SELECT 
-                pp.default_code, pt.name, pb.name, sl.name, spl.name,  pc.name,  uu.name, 
-                rsql.quantity, rsql.reserved_quantity, rsql.available_qty 
+        excel_qry = f'''            
+                SELECT 
+                    DISTINCT pt.name, 
+                    pp.default_code, 
+                    pb.name, 
+                    sl.name, 
+                    spl.name,  
+                    pc.name,  
+                    uu.name, 
+                    sq.quantity, 
+                    sq.reserved_quantity, 
+                    sq.quantity - sq.reserved_quantity
             FROM
-                report_stock_quant_line rsql
-                INNER JOIN product_product pp ON pp.id = rsql.product_id
+                stock_quant sq
+                INNER JOIN product_product pp ON pp.id = sq.product_id
                 INNER JOIN product_template pt ON pt.id = pp.product_tmpl_id
-                INNER JOIN stock_location sl ON sl.id = rsql.location_id
-                LEFT JOIN product_brand pb ON pb.id = rsql.product_brand_id
-                LEFT JOIN stock_production_lot spl ON spl.id = rsql.lot_id
-                LEFT JOIN product_category pc ON pc.id = rsql.categ_id
-                LEFT JOIN uom_uom uu ON uu.id = rsql.product_uom_id
+                INNER JOIN stock_location sl ON sl.id = sq.location_id
+                LEFT JOIN product_brand pb ON pb.id = pt.product_brand_id
+                LEFT JOIN stock_production_lot spl ON spl.id = sq.lot_id
+                LEFT JOIN product_category pc ON pc.id = pt.categ_id
+                LEFT JOIN uom_uom uu ON uu.id = pt.uom_id
             WHERE
                 sl.usage = 'internal' AND 
-                rsql.quantity > 0.0 
+                sq.quantity > 0.0 AND
+                pt.detailed_type = 'product'
                 {wh}
         '''
         cr.execute(excel_qry)
@@ -118,8 +149,9 @@ class ReportStockQuant(models.TransientModel):
     def get_xlsx_report(self):
         result = self._button_excel()
         output = io.BytesIO()
-        titles = ['REF. PRODUCTO', 
+        titles = [
                   'PRODUCTO', 
+                  'REF. PRODUCTO', 
                   'MARCA',
                   'UBICACIÓN', 
                   'LOTE', 
@@ -161,27 +193,6 @@ class ReportStockQuant(models.TransientModel):
         self.xls_filename = "report_stock.xlsx"
 
     
-    def button_bi(self):
-        self.compute_report()
-        return_dict = {}
-        if 'pivot' in self._context:
-            view_id = self.env['ir.ui.view'].search([('name','=','report_stock_quant_line_pivot')], limit=1)
-            return_dict.update({'view_mode': 'pivot'})
-        else:
-            view_id = self.env['ir.ui.view'].search([('name','=','report_stock_quant_line_pivot')], limit=1)
-            search_view_id = self.env['ir.ui.view'].search([('name','=','report_stock_quant_line_search')], limit=1)
-            return_dict.update({
-                'search_view_id': search_view_id.id,
-                'view_mode': 'tree'})
-        return_dict.update({
-            'name': 'Disponibilidad Stock',
-            'view_type': 'pivot',
-            'view_id': view_id.id,
-            'res_model': 'report.stock.quant.line',
-            'type': 'ir.actions.act_window',
-        })
-        return return_dict
-    
     
 class ReportStockQuantLine(models.Model):
     _name = 'report.stock.quant.line'
@@ -198,3 +209,4 @@ class ReportStockQuantLine(models.Model):
     categ_id = fields.Many2one('product.category', 'Categoría Contable', copy=False, readonly=True, index=True)
     product_brand_id = fields.Many2one(comodel_name="product.brand", string="Marca", copy=False, readonly=True, index=True)
     product_uom_id = fields.Many2one('uom.uom', 'Unidad de Medida', readonly=True, copy=False)
+
