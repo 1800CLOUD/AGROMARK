@@ -8,7 +8,7 @@
         />
 
     <menuitem id="menu_report_margen_product"
-              name="Margen de productos"
+              name="Margen por productos"
               parent="menu_account_report_following"
               action="action_report_margen"
               sequence="1"/>
