@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <menuitem id="menu_partner_report_account"
-            name="Informes 1800CLOUD"
-            parent="account_accountant.menu_accounting"
-            sequence="25"
+    
+    <menuitem id="menu_account_report_following" 
+            parent="account_report.menu_partner_report_accountant" 
+            sequence="7" 
+            name="Informes de Seguimiento" 
         />
 
     <menuitem id="menu_report_margen_product"
               name="Margen de productos"
-              parent="report_margen_product.menu_partner_report_account"
+              parent="menu_account_report_following"
               action="action_report_margen"
-              sequence="15"/>
+              sequence="1"/>
 
 </odoo>
