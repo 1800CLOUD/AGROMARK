@@ -11,7 +11,7 @@
     'website': 'https://1-800cloud.com',
     'category': 'Accounting/Accounting',
     'license': 'LGPL-3',
-    'version': '15.0.0.0.3',
+    'version': '15.0.0.0.4',
     'depends': [
         'base_setup',
         'account_report',
@@ -19,6 +19,7 @@
         'report_xlsx',
         'account_baseline',
         'account',
+        'account_report',
     ],
     'data': [
         'security/ir.model.access.csv',
