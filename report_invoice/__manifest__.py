@@ -11,12 +11,13 @@
     'website': 'https://1-800cloud.com',
     'category': 'sales/sale',
     'license': 'LGPL-3',
-    'version': '15.0.0.4.4',
+    'version': '15.0.0.4.5',
     'depends': [
         'base_setup',
         'account_baseline',
         'account',
         'account_report',
+        'report_margen_product',
     ],
     'data': [
         'security/ir.model.access.csv',
