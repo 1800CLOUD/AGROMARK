@@ -1058,7 +1058,7 @@ class AccountauxiliaryWizard(models.Model):
         # THEAD
         th_text = ''
         for th in header:
-            th_text += '<div class="act_as_cell">%s</div>' % th[1]
+            th_text += '<div class="act_as_cell" style="font-size: 13px; font-family: helvetica;">%s</div>' % th[1]
 
         html_text = html_text.replace('th_report', th_text)
 
@@ -1081,7 +1081,7 @@ class AccountauxiliaryWizard(models.Model):
                         k in ('initial', 'debit', 'credit',
                               'final') and 'amount' or 'left'
                     ])
-                    tr_text += '<div class="act_as_cell %s">%s</div>' % (
+                    tr_text += '<div class="act_as_cell %s" style="font-size: 13px; font-family: helvetica;">%s</div>' % (
                         class_span,
                         type(v) in (type(2), type(2.3)) and \
                         '{:_.2f}'.format(v).replace('.',',').replace('_','.') or \
@@ -1100,28 +1100,28 @@ class AccountauxiliaryWizard(models.Model):
         table_h = '''
             <div class="act_as_table data_table">
                 <div class="act_as_row">
-                    <div class="act_as_cell labels">{inf_tag}</div>
-                    <div class="act_as_cell">{inf_val}</div>
-                    <div class="act_as_cell labels">{dat_tag}</div>
-                    <div class="act_as_cell">{dat_val}</div>
+                    <div class="act_as_cell labels" style="font-size: 13px;">{inf_tag}</div>
+                    <div class="act_as_cell" style="font-size: 13px;">{inf_val}</div>
+                    <div class="act_as_cell labels" style="font-size: 13px;">{dat_tag}</div>
+                    <div class="act_as_cell" style="font-size: 13px;">{dat_val}</div>
                 </div>
                 <div class="act_as_row">
-                    <div class="act_as_cell labels">{com_tag}</div>
-                    <div class="act_as_cell">{com_val}</div>
-                    <div class="act_as_cell labels">{ini_tag}</div>
-                    <div class="act_as_cell">{ini_val}</div>
+                    <div class="act_as_cell labels" style="font-size: 13px;">{com_tag}</div>
+                    <div class="act_as_cell" style="font-size: 13px;">{com_val}</div>
+                    <div class="act_as_cell labels" style="font-size: 13px;">{ini_tag}</div>
+                    <div class="act_as_cell" style="font-size: 13px;">{ini_val}</div>
                 </div>
                 <div class="act_as_row">
-                    <div class="act_as_cell labels">{nit_tag}</div>
-                    <div class="act_as_cell">{nit_val}</div>
-                    <div class="act_as_cell labels">{end_tag}</div>
-                    <div class="act_as_cell">{end_val}</div>
+                    <div class="act_as_cell labels" style="font-size: 13px;">{nit_tag}</div>
+                    <div class="act_as_cell" style="font-size: 13px;">{nit_val}</div>
+                    <div class="act_as_cell labels" style="font-size: 13px;">{end_tag}</div>
+                    <div class="act_as_cell" style="font-size: 13px;">{end_val}</div>
                 </div>
                 <div class="act_as_row">
-                    <div class="act_as_cell labels">{type_tag}</div>
-                    <div class="act_as_cell">{type_val}</div>
-                    <div class="act_as_cell labels"></div>
-                    <div class="act_as_cell"></div>
+                    <div class="act_as_cell labels" style="font-size: 13px;">{type_tag}</div>
+                    <div class="act_as_cell" style="font-size: 13px;">{type_val}</div>
+                    <div class="act_as_cell labels" style="font-size: 13px;"></div>
+                    <div class="act_as_cell" style="font-size: 13px;"></div>
                 </div>
             </div>
         '''.format(
