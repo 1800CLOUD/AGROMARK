@@ -34,6 +34,6 @@
     <menuitem
         id="account_details_wizard_menu"
         action="invoice_details_wizard_action"
-        parent="report_margen_product.menu_partner_report_account"
-        sequence="20" />
+        parent="report_margen_product.menu_account_report_following"
+        sequence="2" />
 </odoo>

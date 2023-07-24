@@ -56,6 +56,9 @@
         <field name="target">new</field>
     </record>
 
-    <menuitem id="menu_report_auxiliary" parent="report_margen_product.menu_partner_report_account" sequence="30" 
-        name="Reporte Auxiliar" action="action_report_auxiliary" />
+    <menuitem id="menu_report_copy" parent="account_report.menu_partner_report_accountant" sequence="10" 
+        name="Reportes con Funcionalidades extra" />
+    
+    <menuitem id="menu_report_auxiliary" parent="menu_report_copy" sequence="1" 
+        name="Reporte Auxiliar con cuenta analitica" action="action_report_auxiliary" />
 </odoo>

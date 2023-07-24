@@ -51,7 +51,7 @@
         <field name="target">new</field>
     </record>
 
-    <menuitem id="menu_account_balance_trial" parent="report_margen_product.menu_partner_report_account" sequence="25" 
+    <menuitem id="menu_account_balance_trial" parent="report_auxiliary.menu_report_copy" sequence="2" 
         name="Balance de Pruebas" action="action_balance_account" />
 
 </odoo>
