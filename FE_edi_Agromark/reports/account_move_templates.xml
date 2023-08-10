@@ -9,7 +9,7 @@
         <xpath expr="//table[@name='invoice_line_table']//td[5]" position="after">
             <td class="text-center">
                 <t t-foreach="line.tax_ids" t-as="t">
-                    <t t-if="t.tax_group_id.name == 'IVA 19% GENERADO'">
+                    <t t-if="t.dian_tax_type_id.dian_code == '01'">
                         <span t-esc="'{0:,.2f}'.format(t.amount)"/>
                         %
                     </t>
