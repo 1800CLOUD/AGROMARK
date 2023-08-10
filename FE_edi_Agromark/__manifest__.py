@@ -12,7 +12,7 @@
     'contributors': [' Diego Castaño <diego.castano@1-800cloud.com>'],
     'category': 'Accounting/Localizations/EDI',
     'license': 'OPL-1',
-    'version': '15.0.0.0.2',
+    'version': '15.0.0.0.3',
     'depends': [
         'l10n_co_bloodo'
     ],
