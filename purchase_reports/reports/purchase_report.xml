@@ -61,11 +61,12 @@
                 <field name="purchase_id" optional="show"/>
                 <field name="account_inventory" optional="hide"/>
                 <field name="invoice_id" optional="show"/>
-
+                <field name="ref_invoice" optional="hide"/>
                 <field name="journal_id" optional="hide"/>
                 <field name="product_id" optional="show"/>
                 <field name="default_code" optional="hide"/>
                 <field name="amount_untaxed" sum="total" widget="monetary"/>
+                <field name="discount" sum="total" widget="monetary" optional="hide"/>
                 <field name="tax_id" optional="hide"/>
                 <field name="value_tax" sum="total" widget="monetary"/>
                 <field name="amount_total" sum="total"/>
