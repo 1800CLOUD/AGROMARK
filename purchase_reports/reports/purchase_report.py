@@ -51,20 +51,25 @@ class ReportPurchase(models.TransientModel):
         cr.execute(f'DELETE FROM report_purchase_line')
             
         qry = f'''
-            INSERT INTO report_purchase_line (invoice_date, partner_vat, partner_id, purchase_id, invoice_id, journal_id, default_code, 
-                        product_id, account_id, account_inventory, amount_untaxed, tax_id, value_tax, amount_total, move_type, product_type, create_date, write_date)
+            INSERT INTO report_purchase_line (invoice_date, partner_vat, partner_id, purchase_id, invoice_id, ref_invoice, journal_id, default_code, 
+                        product_id, account_id, account_inventory, amount_untaxed, discount, tax_id, value_tax, amount_total, move_type, product_type, create_date, write_date)
                 SELECT
                     am.invoice_date,
                     rp.vat, 
                     am.partner_id, 
                     po.id, 
-                    aml.move_id,  
+                    aml.move_id,
+                    am.ref,  
                     am.journal_id,
                     pt.default_code, 
                     aml.product_id,
                     aml.account_id,
                     svl.aml_code,
                     aml.balance,
+                    CASE 
+                        WHEN aml.discount > 0 THEN (aml.price_unit * aml.quantity * aml.discount)/100
+                        ELSE NULL
+                    END,
                     at.tax,
                     CASE 
                         WHEN am.move_type = 'in_refund' THEN at.value * (-1)
@@ -94,7 +99,7 @@ class ReportPurchase(models.TransientModel):
                                         ELSE NULL
                                     END AS tax,
                                     CASE
-                                        WHEN dt.id = 1 THEN SUM((at.amount * aml.price_subtotal)/100)
+                                        WHEN dt.id = 1 THEN SUM((at.amount * (aml.quantity * aml.price_unit))/100)
                                         ELSE NULL
                                     END AS value
                                 FROM
@@ -126,15 +131,15 @@ class ReportPurchase(models.TransientModel):
             WHERE 
                 am.move_type IN ('in_invoice', 'in_refund', 'in_receipt') AND
                 am.state = 'posted' AND
-                am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}'
-                {wh}
+                am.invoice_date BETWEEN '{dt_from} 00:00:00' AND '{dt_to} 23:59:59' {wh}
                 
                 GROUP BY 
                 am.invoice_date,
                 rp.vat,
                 am.partner_id,
                 po.id, 
-                am.id,  
+                am.id,
+                am.ref,  
                 am.journal_id, 
                 pt.default_code,
                 aml.product_id,
@@ -172,12 +177,17 @@ class ReportPurchase(models.TransientModel):
                 po.name,
                 am.invoice_date,
                 am.name,
+                am.ref,
                 aj.name,  
                 pt.default_code,
                 pt.name,
                 aa.code, 
                 svl.aml_code,
                 aml.balance,
+                CASE 
+                    WHEN aml.discount > 0 THEN (aml.price_unit * aml.quantity * aml.discount)/100
+                    ELSE NULL
+                END,
                 at.tax,
                 at.value,
                 CASE
@@ -199,7 +209,7 @@ class ReportPurchase(models.TransientModel):
                                         ELSE ''
                                     END AS tax,
                                     CASE
-                                        WHEN dt.id = 1 THEN SUM((at.amount * aml.price_subtotal)/100)
+                                        WHEN dt.id = 1 THEN SUM((at.amount * (aml.quantity * aml.price_unit))/100)
                                         ELSE NULL
                                     END AS value
                                 FROM
@@ -246,6 +256,7 @@ class ReportPurchase(models.TransientModel):
                 aa.code,
                 svl.aml_code,
                 at.tax,
+                am.ref,
                 at.value,
                 am.move_type,
                 am.amount_total,
@@ -265,14 +276,16 @@ class ReportPurchase(models.TransientModel):
                   'ORDEN DE COMPRA', 
                   'FECHA FACTURA',
                   'FACTURA',
+                  'REF. FACTURA',
                   'DIARIO',
                   'REFERENCIA INTERNA',
                   'PRODUCTO',
                   'CUENTA',
                   'CUENTA INVENTARIO',
                   'VALOR A. IMPUESTO', 
-                  'VALOR IVA',
+                  'DESCUENTO',
                   'TARIFA IVA',
+                  'VALOR IVA',
                   'VALOR TOTAL'
                   ]
     
@@ -280,30 +293,54 @@ class ReportPurchase(models.TransientModel):
         worksheet = workbook.add_worksheet()
 
         # Formants
-        titles_format = workbook.add_format()
-        titles_format.set_align("center")
-        titles_format.set_bold()
-        worksheet.set_column("A:G", 22)
-        worksheet.set_row(0, 25)
+        title_format = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'valign': 'vcenter',
+            'bg_color': '#87CEEB',
+            'font_color': 'black',
+            'font_size': 12,
+        })
+    
+        user_format = workbook.add_format({
+            'bold': True,
+            'font_color': 'black',
+        })
+        
+        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+
+        worksheet.set_column("A:P", 15)
+        worksheet.set_row(0, 30)
+
+        # Write title with merged cells
+        worksheet.merge_range('A1:P1', 'REPORTE DE COMPRAS', title_format)
+
+        # Write Generador and Usuario
+        worksheet.write('A2', 'Generador:', user_format)
+        worksheet.write('B2', self.env.user.name)
+
+
+        start_date = self.date_from
+        end_date = self.date_to
+        date_range = f'Fecha Inicio: {start_date} - Fecha Fin: {end_date}'
+        worksheet.write('A3', date_range, user_format)
+
+        # Write headers
+        for col_num, title in enumerate(titles):
+            worksheet.write(5, col_num, title, title_format)
+        
+    
         money_format = workbook.add_format({'num_format': '$#,##0.00'})
-        
-        col_num = 0
-        for title in titles:
-            worksheet.write(0, col_num, title, titles_format)
-            col_num += 1
-        
         for index, data in enumerate(result):
-            row = index + 1
-            col_num = 0
-            for i, d in enumerate(data):
-                if i in [9,11, 12]:
+            row = index + 6
+            for col_num, d in enumerate(data):
+                if isinstance(d, datetime.date):
+                    worksheet.write_datetime(row, col_num, d, date_format)
+                elif col_num in [9,11, 12, 14, 15]:
                     worksheet.write(row, col_num, d, money_format)
                 else:
                     worksheet.write(row, col_num, d)
-                if isinstance(d, datetime.date):
-                    d = d.strftime("%Y-%m-%d")
-                    worksheet.write(row, col_num, d)
-                col_num += 1
+
             
         
         workbook.close()
@@ -350,6 +387,8 @@ class ReportPurchaseLine(models.Model):
     tax_id = fields.Many2one('account.tax', 'Impuesto', copy=False, readonly=True)
     amount_total = fields.Float('Valor total', copy=False, readonly=True)
     value_tax = fields.Float('Valor Iva', copy=False, readonly=True)
+    ref_invoice = fields.Char('Ref. factura', copy=False, readonly=True)
+    discount = fields.Float('Descuento', copy=False, readonly=True)
     move_type = fields.Selection([
         ('in_invoice', 'Factura Proveedor'),
         ('in_refund', 'Factura rectificativa'),

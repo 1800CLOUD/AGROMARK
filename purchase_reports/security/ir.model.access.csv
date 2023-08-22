@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_purchase_agromark_purchase_agromark,purchase_agromark.purchase_agromark,model_purchase_agromark_purchase_agromark,base.group_user,1,1,1,1
+
+purchase_reports.access_report_purchase,report.purchase,purchase_reports.model_report_purchase,base.group_user,1,1,1,1
+purchase_reports.access_report_purchase_line,report.purchase.line`,purchase_reports.model_report_purchase_line,base.group_user,1,1,1,1
