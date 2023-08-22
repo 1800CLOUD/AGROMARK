@@ -99,7 +99,7 @@ class ReportPurchase(models.TransientModel):
                                         ELSE NULL
                                     END AS tax,
                                     CASE
-                                        WHEN dt.id = 1 THEN SUM((at.amount * aml.price_subtotal)/100)
+                                        WHEN dt.id = 1 THEN SUM((at.amount * (aml.quantity * aml.price_unit))/100)
                                         ELSE NULL
                                     END AS value
                                 FROM
@@ -131,8 +131,7 @@ class ReportPurchase(models.TransientModel):
             WHERE 
                 am.move_type IN ('in_invoice', 'in_refund', 'in_receipt') AND
                 am.state = 'posted' AND
-                am.invoice_date BETWEEN   '{dt_from}' AND '{dt_to}'
-                {wh}
+                am.invoice_date BETWEEN '{dt_from} 00:00:00' AND '{dt_to} 23:59:59' {wh}
                 
                 GROUP BY 
                 am.invoice_date,
@@ -210,7 +209,7 @@ class ReportPurchase(models.TransientModel):
                                         ELSE ''
                                     END AS tax,
                                     CASE
-                                        WHEN dt.id = 1 THEN SUM((at.amount * aml.price_subtotal)/100)
+                                        WHEN dt.id = 1 THEN SUM((at.amount * (aml.quantity * aml.price_unit))/100)
                                         ELSE NULL
                                     END AS value
                                 FROM
@@ -285,8 +284,8 @@ class ReportPurchase(models.TransientModel):
                   'CUENTA INVENTARIO',
                   'VALOR A. IMPUESTO', 
                   'DESCUENTO',
-                  'VALOR IVA',
                   'TARIFA IVA',
+                  'VALOR IVA',
                   'VALOR TOTAL'
                   ]
     
