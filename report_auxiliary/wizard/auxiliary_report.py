@@ -144,7 +144,7 @@ class AccountauxiliaryWizard(models.Model):
         query_data_acc_rp = self.prepare_data_acc_rp()
         query_data_acc = self.prepare_data_acc()
         query_data_rp = self.prepare_data_rp()
-    
+
         data_detail = self._execute_query(query_data_detail)
         query_data = data_detail
         query_data = sorted(
@@ -181,9 +181,9 @@ class AccountauxiliaryWizard(models.Model):
                 query_data,
                 key=lambda r: [date.today() if r['date'] == '' else r['date'], r['move'], r['partner'], not r['bold']]
             )
-    
+
         return {'report_data': query_data and query_data or []}
-    
+
     def _execute_query(self, query):
         self.env.cr.execute(query)
         data_query = self.env.cr.dictfetchall()
@@ -232,7 +232,6 @@ class AccountauxiliaryWizard(models.Model):
                 debit= self.report_type == 'ifrs' and 'ifrs_debit' or 'debit',
                 credit= self.report_type == 'ifrs' and 'ifrs_credit' or 'credit')
         return where
-    
 
     def _get_query_where2(self):
         where = self._get_query_where()
@@ -261,7 +260,7 @@ class AccountauxiliaryWizard(models.Model):
             am.name as move,
             aml.name as line,
         """
-        
+
         if self.currency_by:
             query += """
                 rc.name as currency,
