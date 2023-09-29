@@ -33,8 +33,7 @@ class AccountauxiliaryInvoicesWizard(models.Model):
         data_report = {}
         out = action_report.report_action(self, data=data_report)
         return out
-    
-    
+
     def data_report_preview(self):
         self.ensure_one()
         header = self.prepare_header()
@@ -151,3 +150,13 @@ class AccountauxiliaryInvoicesWizard(models.Model):
 
         html_text = html_text.replace('table_header', table_h)
         return html_text
+    
+    def prepare_data(self):
+        out = super(AccountauxiliaryInvoicesWizard, self).prepare_data()
+        query_data = out.get('report_data', [])
+        query_data = sorted(
+            query_data,
+            key=lambda r: [r.get('code'), r.get('partner'), r.get('date'), r.get('move')]
+        )
+
+        return {'report_data': query_data and query_data or []}
